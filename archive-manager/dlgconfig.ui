@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>dlgConfig</class>
+ <widget class="QDialog" name="dlgConfig">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Configuration</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QFormLayout" name="formLayout">
+     <item row="0" column="0">
+      <widget class="QLabel" name="lblLogdir">
+       <property name="toolTip">
+        <string>Log directory - use links to change or reset to last saved</string>
+       </property>
+       <property name="text">
+        <string>Log dir (&lt;a href=&quot;edit&quot;&gt;chg&lt;/a&gt;/&lt;a href=&quot;clear&quot;&gt;rst&lt;/a&gt;)</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="txtLogDir">
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="lblLogFilespec">
+       <property name="text">
+        <string>Log filespec</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLineEdit" name="txtLogFilespec"/>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="lblGitDir">
+       <property name="toolTip">
+        <string>Use change or reset link to select Git bash install dir</string>
+       </property>
+       <property name="text">
+        <string>Git bash dir (&lt;a href=&quot;change&quot;&gt;chg&lt;/a&gt;/&lt;a href=&quot;reset&quot;&gt;rst&lt;/a&gt;)</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLineEdit" name="txtGitDir">
+       <property name="toolTip">
+        <string>Install directory for git bash (should contain bin). Use change or reset hyperlink to change.</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="lblExtractDir">
+       <property name="toolTip">
+        <string>Change or reset extraction dir using hyperlink</string>
+       </property>
+       <property name="text">
+        <string>Extract dir (&lt;a href=&quot;change&quot;&gt;chg&lt;/a&gt;/&lt;a href=&quot;reset&quot;&gt;rst&lt;/a&gt;)</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLineEdit" name="txtExtractionDir">
+       <property name="toolTip">
+        <string>Where to extract logs</string>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="lblExtractScript">
+       <property name="text">
+        <string>Extract script (&lt;a href=&quot;change&quot;&gt;chg&lt;/a&gt;/&lt;a href=&quot;reset&quot;&gt;rst&lt;/a&gt;)</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QLineEdit" name="txtExtractScript">
+       <property name="toolTip">
+        <string>Bash script to extract archive into current directory</string>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>dlgConfig</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>dlgConfig</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
