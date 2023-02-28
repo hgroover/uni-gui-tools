@@ -161,19 +161,135 @@ void MainWindow::on_Refresh()
 void MainWindow::on_lstLogs_currentRowChanged(int currentRow)
 {
     qDebug() << "New row" << currentRow << "extract" << extractionValid_ << "bash" << bashValid_;
+    curSelectedRow_ = currentRow;
     if (currentRow < 0 || currentRow >= ui->lstLogs->count())
     {
         ui->btnLogExtract->setEnabled(false);
+        ui->btnView->setEnabled(false);
+        ui->btnClear->setEnabled(false);
+        curLogExtractDir_.clear();
+        curLogFilename_.clear();
+        curLogTarballPath_.clear();
         ui->txtItemDetails->setText("<h2>No item selected</h2>");
     }
     else
     {
-        ui->btnLogExtract->setEnabled(extractionValid_ && bashValid_ && extractScriptValid_);
+        curLogFilename_ = ui->lstLogs->currentItem()->text();
+        //QFileInfo fi(curLogFilename_);
+        QString baseName(tarballBasename(curLogFilename_));
+        QDir emptyDir(extractDir_ + '/' + baseName);
+        curLogTarballPath_ = logDir_ + '/' + curLogFilename_;
+        curLogExtractDir_ = emptyDir.path();
+        ui->btnLogExtract->setEnabled(extractionValid_ && bashValid_ && extractScriptValid_ && !emptyDir.exists());
+        ui->btnClear->setEnabled(emptyDir.exists());
+        ui->btnView->setEnabled(emptyDir.exists());
     }
 }
 
 void MainWindow::on_btnLogExtract_clicked()
 {
-    QFileInfo fi(ui->lstLogs->currentItem()->text());
-    qInfo().noquote() << "Extracting" << fi.fileName() << "base" << fi.baseName();
+    QDir parentDir(extractDir_);
+    if (parentDir.mkpath(curLogExtractDir_))
+    {
+        qInfo().noquote() << "Extracting" << curLogFilename_ << "to" << curLogExtractDir_;
+        QProcess pExtract(this);
+        // You would think this would work, but the script will still run in the app dir unless we explicitly change
+        // the app's working directory.
+        pExtract.setWorkingDirectory(curLogExtractDir_);
+        QString appCurrentDir(QDir::currentPath());
+        QDir::setCurrent(curLogExtractDir_);
+        QString gitPath("\"");
+        gitPath += gitShellPath_;
+        gitPath += "\" -c \"";
+        gitPath += bashify(extractScript_);
+        gitPath += ' ';
+        gitPath += bashify(curLogTarballPath_);
+        gitPath += '\"';
+        int res = pExtract.execute(gitPath);
+        // execute() returns -1 if crash, -2 if cannot start, else ok
+        switch (res)
+        {
+        case -1:
+            qCritical() << "Program crashed";
+            break;
+        case -2:
+            qCritical().noquote() << "Failed to start" << gitPath;
+            break;
+        case 0:
+            qInfo().noquote() << "Success, cwd" << pExtract.workingDirectory();
+            break;
+        default:
+            qInfo().noquote() << "Script failed - result of" << gitPath << ":" << res;
+            break;
+        }
+        QDir::setCurrent(appCurrentDir);
+    }
+    else
+    {
+        qInfo().noquote() << "Failed to create dir path" << curLogExtractDir_;
+    }
+    //qInfo().noquote() << "Extracting" << fi.fileName() << "base" << tarballBasename(fi.fileName());
+}
+
+QString MainWindow::tarballBasename(QString tarballFilename)
+{
+    // Trailing .tar, tar.bz2, .tgz
+    static const char *szExt[] = {".tar.bz2", ".tar", ".tgz"};
+    for (size_t n = 0; n < sizeof(szExt)/sizeof(szExt[0]); n++)
+    {
+        int extPos = tarballFilename.lastIndexOf(szExt[n], -1, Qt::CaseInsensitive);
+        if (extPos > 0)
+        {
+            return tarballFilename.left(extPos);
+        }
+    }
+    // Not found
+    qWarning().noquote() << "No extension found in" << tarballFilename;
+    return tarballFilename;
+}
+
+QString MainWindow::bashify(QString windowsPath)
+{
+    QString driveLetter = windowsPath.left(2);
+    if (driveLetter.length() < 2 || driveLetter[1] != ':')
+    {
+        qWarning().noquote() << "Not an absolute windows path:" << windowsPath;
+        return windowsPath;
+    }
+    return driveLetter.left(1).toLower().prepend('/') + windowsPath.mid(2);
+}
+
+void MainWindow::on_btnView_clicked()
+{
+    QDir logDir(curLogExtractDir_);
+    logDir.setFilter(QDir::NoDotAndDotDot|QDir::AllEntries);
+    qInfo().noquote() << "Contents of" << logDir.path() << "count:" << logDir.count();
+    QFileInfoList a(logDir.entryInfoList());
+    for (int n = 0; n < a.length(); n++)
+    {
+        qInfo().noquote() << '[' << n << ']' << a[n];
+    }
+}
+
+void MainWindow::on_btnClear_clicked()
+{
+    QDir parentDir(extractDir_);
+    if (!curLogExtractDir_.isEmpty()
+            && parentDir.exists(curLogExtractDir_))
+    {
+        qInfo().noquote() << "Removing" << curLogExtractDir_;
+        QDir exDir(curLogExtractDir_);
+        if (exDir.removeRecursively())
+        {
+            qInfo().noquote() << "Success";
+        }
+        else
+        {
+            qWarning().noquote() << "Failed to remove recursively";
+        }
+    }
+    else
+    {
+        qWarning().noquote() << "Cannot remove" << curLogExtractDir_;
+    }
 }

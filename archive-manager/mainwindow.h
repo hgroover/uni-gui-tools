@@ -15,6 +15,9 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    static QString tarballBasename(QString tarballFilename);
+    static QString bashify(QString windowsPath);
+
 protected slots:
     void on_LogDirChanged(QString logDir);
     void on_LogFilespecChanged(QString logFilespec);
@@ -36,6 +39,10 @@ private slots:
 
     void on_btnLogExtract_clicked();
 
+    void on_btnView_clicked();
+
+    void on_btnClear_clicked();
+
 private:
     Ui::MainWindow *ui;
     QString logDir_;
@@ -50,6 +57,11 @@ private:
     bool extractScriptValid_;
     int logListDirty_;
 
+    // Current item row values set by on_lstLogs_currentRowChanged
+    int curSelectedRow_;
+    QString curLogFilename_;
+    QString curLogExtractDir_;
+    QString curLogTarballPath_;
 };
 
 #endif // MAINWINDOW_H
