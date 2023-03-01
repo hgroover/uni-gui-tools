@@ -97,6 +97,20 @@
        </property>
       </widget>
      </item>
+     <item row="5" column="0">
+      <widget class="QLabel" name="lblBaseUrl">
+       <property name="text">
+        <string>Base url</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <widget class="QLineEdit" name="txtBaseUrl">
+       <property name="toolTip">
+        <string>Base url for http listing of archives to download</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>

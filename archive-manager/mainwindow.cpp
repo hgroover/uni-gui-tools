@@ -14,6 +14,7 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
+    web_(this),
     extractionValid_(false),
     bashValid_(false),
     extractScriptValid_(false),
@@ -30,11 +31,16 @@ MainWindow::MainWindow(QWidget *parent) :
     //ui->txtGitDir->setText(gitDir_);
     on_ExtractionDirChanged(settings.value("extractionDir").toString());
     on_ExtractScriptChanged(settings.value("extractScript").toString());
+    baseUrl_ = settings.value("baseUrl").toString();
+    ui->txtBaseUrl->setText(baseUrl_);
+    connect(this, SIGNAL(updatedBaseUrl(QString)), &web_, SLOT(on_UpdatedBaseUrl(QString)));
     QTimer::singleShot(500, this, SLOT(on_Refresh()));
 }
 
 MainWindow::~MainWindow()
 {
+    disconnect(this, SIGNAL(updatedBaseUrl(QString)), &web_, SLOT(on_UpdatedBaseUrl(QString)));
+    web_.close();
     delete ui;
 }
 
@@ -73,17 +79,20 @@ void MainWindow::on_btnConfigure_clicked()
     connect( &dlg, SIGNAL(updatedGitDir(QString)), this, SLOT(on_GitDirChanged(QString)));
     connect( &dlg, SIGNAL(updatedExtractionDir(QString)), this, SLOT(on_ExtractionDirChanged(QString)));
     connect( &dlg, SIGNAL(updatedExtractScript(QString)), this, SLOT(on_ExtractScriptChanged(QString)));
+    connect( &dlg, SIGNAL(updatedBaseUrl(QString)), this, SLOT(on_BaseUrlChanged(QString)));
     dlg.setGitDir(gitDir_);
     dlg.setLogDir(logDir_);
     dlg.setLogFilespec(logFilespec_);
     dlg.setExtractionDir(extractDir_);
     dlg.setExtractScript(extractScript_);
+    dlg.setBaseUrl(baseUrl_);
     int dlgRes = dlg.exec();
     disconnect( &dlg, SIGNAL(updatedLogDir(QString)), this, SLOT(on_LogDirChanged(QString)));
     disconnect( &dlg, SIGNAL(updatedLogFilespec(QString)), this, SLOT(on_LogFilespecChanged(QString)));
     disconnect( &dlg, SIGNAL(updatedGitDir(QString)), this, SLOT(on_GitDirChanged(QString)));
     disconnect( &dlg, SIGNAL(updatedExtractionDir(QString)), this, SLOT(on_ExtractionDirChanged(QString)));
     disconnect( &dlg, SIGNAL(updatedExtractScript(QString)), this, SLOT(on_ExtractScriptChanged(QString)));
+    disconnect( &dlg, SIGNAL(updatedBaseUrl(QString)), this, SLOT(on_BaseUrlChanged(QString)));
     qInfo() << "config returned" << dlgRes;
 }
 
@@ -131,6 +140,14 @@ void MainWindow::on_ExtractScriptChanged(QString extractScript)
     ui->txtExtractScript->setText(extractScript);
     QFileInfo fi(extractScript);
     extractScriptValid_ = fi.exists();
+}
+
+void MainWindow::on_BaseUrlChanged(QString baseUrl)
+{
+    baseUrl_ = baseUrl;
+    ui->txtBaseUrl->setText(baseUrl);
+    ui->btnDownload->setEnabled(!baseUrl.isEmpty());
+    emit updatedBaseUrl(baseUrl);
 }
 
 void MainWindow::on_btnRefresh_clicked()
@@ -315,4 +332,23 @@ void MainWindow::populateViewBrowser(bool extracted)
 void MainWindow::on_txtItemDetails_anchorClicked(const QUrl &arg1)
 {
     qInfo().noquote() << "url:" << arg1.toString();
+}
+
+void MainWindow::on_btnDownload_clicked()
+{
+    if (!web_.isVisible())
+    {
+        web_.setVisible(true);
+    }
+    qInfo().noquote() << "Showing download window with" << baseUrl_;
+    web_.show();
+    emit updatedBaseUrl(baseUrl_);
+    web_.setFocus();
+}
+
+void MainWindow::on_DownloadCompleted(QString filename)
+{
+    // filename should exist in downloads
+    ui->lstLogs->insertItem(0, filename);
+    QTimer::singleShot(0, this, SLOT(on_lstLogs_currentRowChanged(0)));
 }

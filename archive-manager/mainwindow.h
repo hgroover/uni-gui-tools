@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 
+#include "webdownload.h"
+
 namespace Ui {
 class MainWindow;
 }
@@ -18,14 +20,19 @@ public:
     static QString tarballBasename(QString tarballFilename);
     static QString bashify(QString windowsPath);
 
+signals:
+    void updatedBaseUrl(QString baseUrl);
+
 protected slots:
     void on_LogDirChanged(QString logDir);
     void on_LogFilespecChanged(QString logFilespec);
     void on_GitDirChanged(QString gitDir);
     void on_ExtractionDirChanged(QString extractionDir);
     void on_ExtractScriptChanged(QString extractScript);
+    void on_BaseUrlChanged(QString baseUrl);
     void on_Refresh();
     void populateViewBrowser(bool extracted);
+    void on_DownloadCompleted(QString filename);
 
 private slots:
     void on_pushButton_clicked();
@@ -46,8 +53,11 @@ private slots:
 
     void on_txtItemDetails_anchorClicked(const QUrl &arg1);
 
+    void on_btnDownload_clicked();
+
 private:
     Ui::MainWindow *ui;
+    WebDownload web_;
     QString logDir_;
     QString logFilespec_;
     QString gitDir_;
@@ -55,6 +65,7 @@ private:
     QString gitShellPath_;
     QString extractDir_;
     QString extractScript_;
+    QString baseUrl_;
     bool extractionValid_;
     bool bashValid_;
     bool extractScriptValid_;

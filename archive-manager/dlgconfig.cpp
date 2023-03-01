@@ -26,12 +26,14 @@ void dlgConfig::on_buttonBox_accepted()
     settings.setValue("gitDir", ui->txtGitDir->text());
     settings.setValue("extractionDir", ui->txtExtractionDir->text());
     settings.setValue("extractScript", ui->txtExtractScript->text());
+    settings.setValue("baseUrl", ui->txtBaseUrl->text());
     // Notify
     emit updatedLogDir(ui->txtLogDir->text());
     emit updatedLogFilespec(ui->txtLogFilespec->text());
     emit updatedGitDir(ui->txtGitDir->text());
     emit updatedExtractionDir(ui->txtExtractionDir->text());
     emit updatedExtractScript(ui->txtExtractScript->text());
+    emit updatedBaseUrl(ui->txtBaseUrl->text());
 }
 
 void dlgConfig::on_lblLogdir_linkActivated(const QString &link)
@@ -72,6 +74,11 @@ void dlgConfig::setExtractionDir(QString extractionDir)
 void dlgConfig::setExtractScript(QString extractScript)
 {
     ui->txtExtractScript->setText(extractScript);
+}
+
+void dlgConfig::setBaseUrl(QString baseUrl)
+{
+    ui->txtBaseUrl->setText(baseUrl);
 }
 
 void dlgConfig::on_lblGitDir_linkActivated(const QString &link)

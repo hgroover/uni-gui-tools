@@ -21,6 +21,7 @@ public slots:
     void setGitDir(QString gitDir);
     void setExtractionDir(QString extractionDir);
     void setExtractScript(QString extractScript);
+    void setBaseUrl(QString baseUrl);
 
 signals:
     void updatedLogDir(QString logDir);
@@ -28,6 +29,7 @@ signals:
     void updatedGitDir(QString gitDir);
     void updatedExtractionDir(QString extractionDir);
     void updatedExtractScript(QString extractScript);
+    void updatedBaseUrl(QString baseUrl);
 
 private slots:
     void on_buttonBox_accepted();

@@ -5,6 +5,9 @@
 #-------------------------------------------------
 
 QT       += core gui widgets
+# Using QNetworkAccessManager
+#QT       += webengine
+QT       += network
 
 TARGET = archive-manager
 TEMPLATE = app
@@ -25,16 +28,19 @@ CONFIG += c++11
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    dlgconfig.cpp
+    dlgconfig.cpp \
+    webdownload.cpp
 
 HEADERS += \
         mainwindow.h \
     dlgconfig.h \
-    archive-manager-globals.h
+    archive-manager-globals.h \
+    webdownload.h
 
 FORMS += \
         mainwindow.ui \
-    dlgconfig.ui
+    dlgconfig.ui \
+    webdownload.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
