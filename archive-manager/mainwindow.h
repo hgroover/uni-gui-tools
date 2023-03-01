@@ -25,6 +25,7 @@ protected slots:
     void on_ExtractionDirChanged(QString extractionDir);
     void on_ExtractScriptChanged(QString extractScript);
     void on_Refresh();
+    void populateViewBrowser(bool extracted);
 
 private slots:
     void on_pushButton_clicked();
@@ -42,6 +43,8 @@ private slots:
     void on_btnView_clicked();
 
     void on_btnClear_clicked();
+
+    void on_txtItemDetails_anchorClicked(const QUrl &arg1);
 
 private:
     Ui::MainWindow *ui;

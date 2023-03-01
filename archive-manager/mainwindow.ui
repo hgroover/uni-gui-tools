@@ -122,14 +122,20 @@
          <property name="title">
           <string>Logs</string>
          </property>
-         <layout class="QVBoxLayout" name="verticalLayout_3" stretch="4,2,0">
+         <layout class="QVBoxLayout" name="verticalLayout_3" stretch="4,0,0">
           <item>
            <widget class="QListWidget" name="lstLogs"/>
           </item>
           <item>
-           <widget class="QTextEdit" name="txtItemDetails">
+           <widget class="QTextBrowser" name="txtItemDetails">
             <property name="readOnly">
              <bool>true</bool>
+            </property>
+            <property name="textInteractionFlags">
+             <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+            </property>
+            <property name="openLinks">
+             <bool>false</bool>
             </property>
            </widget>
           </item>

@@ -183,6 +183,7 @@ void MainWindow::on_lstLogs_currentRowChanged(int currentRow)
         ui->btnLogExtract->setEnabled(extractionValid_ && bashValid_ && extractScriptValid_ && !emptyDir.exists());
         ui->btnClear->setEnabled(emptyDir.exists());
         ui->btnView->setEnabled(emptyDir.exists());
+        populateViewBrowser(emptyDir.exists());
     }
 }
 
@@ -217,6 +218,7 @@ void MainWindow::on_btnLogExtract_clicked()
             break;
         case 0:
             qInfo().noquote() << "Success, cwd" << pExtract.workingDirectory();
+            on_lstLogs_currentRowChanged(ui->lstLogs->currentRow());
             break;
         default:
             qInfo().noquote() << "Script failed - result of" << gitPath << ":" << res;
@@ -282,6 +284,7 @@ void MainWindow::on_btnClear_clicked()
         if (exDir.removeRecursively())
         {
             qInfo().noquote() << "Success";
+            on_lstLogs_currentRowChanged(ui->lstLogs->currentRow());
         }
         else
         {
@@ -292,4 +295,24 @@ void MainWindow::on_btnClear_clicked()
     {
         qWarning().noquote() << "Cannot remove" << curLogExtractDir_;
     }
+}
+
+void MainWindow::populateViewBrowser(bool extracted)
+{
+    QString html;
+    if (extracted)
+    {
+        html = "<h5>" + curLogExtractDir_ + "</h5>";
+        html += "<p><a href=\"hello\">Test link</a></p>";
+    }
+    else
+    {
+        html = "<h4>No contents</h4>";
+    }
+    ui->txtItemDetails->setText(html);
+}
+
+void MainWindow::on_txtItemDetails_anchorClicked(const QUrl &arg1)
+{
+    qInfo().noquote() << "url:" << arg1.toString();
 }
