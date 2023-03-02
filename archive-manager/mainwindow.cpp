@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include "dlgconfig.h"
 #include "archive-manager-globals.h"
+#include "basicfileviewer.h"
 
 #include <QDebug>
 #include <QProcess>
@@ -331,19 +332,67 @@ void MainWindow::populateViewBrowser(bool extracted)
     QString html;
     if (extracted)
     {
+        // If there's an insight script, run it otherwise default action is here
         html = "<h5>" + curLogExtractDir_ + "</h5>";
-        html += "<p><a href=\"hello\">Test link</a></p>";
+        html += "<table><thead><tr><th>File</th><th>Size</th></tr></thead>\n";
+        html += "<tbody>\n";
+        QDir d(curLogExtractDir_);
+        QFileInfoList a = d.entryInfoList(QDir::NoDotAndDotDot|QDir::AllEntries);
+        for (int n = 0; n < a.length(); n++)
+        {
+            html += "<tr>";
+                html += "<td>";
+                    if (a[n].isFile())
+                    {
+                        html += "<a href=\"view:";
+                        html += a[n].fileName();
+                        html += "\">";
+                    }
+                    html += a[n].fileName();
+                    if (a[n].isFile())
+                    {
+                        html += "</a>";
+                    }
+                html += "</td>";
+                html += "<td>";
+                    if (a[n].isFile())
+                    {
+                        html += QString().sprintf("%lld", a[n].size());
+                    }
+                    else
+                    {
+                        html += "&lt;DIR&gt;";
+                    }
+                html += "</td>";
+            html += "</tr>\n";
+        }
+        html += "</tbody>\n";
+        html += "</table>\n";
     }
     else
     {
-        html = "<h4>No contents</h4>";
+        html = "<h4>No contents</h4><p><a href=\"extract:" + curLogFilename_ + "\">click here</a> or extract button</p>";
     }
     ui->txtItemDetails->setText(html);
 }
 
 void MainWindow::on_txtItemDetails_anchorClicked(const QUrl &arg1)
 {
-    qInfo().noquote() << "url:" << arg1.toString();
+    // Get verb:object where object may also have : (e.g. windows paths)
+    QString s(arg1.toString());
+    int colonPos = s.indexOf(':');
+    if (colonPos <= 0)
+    {
+        qWarning().noquote() << "Invalid verb:object" << s;
+        return;
+    }
+    QString verb(s.left(colonPos));
+    QString verbObject(s.mid(colonPos+1));
+    qInfo().noquote() << "Performing" << verb << "on" << verbObject; // << "with" << curLogExtractDir_ << "filename" << curLogFilename_;
+    BasicFileViewer *view = new BasicFileViewer(this, curLogExtractDir_, verbObject);
+    view->setModal(false);
+    view->showNormal();
+    setFocus();
 }
 
 void MainWindow::on_btnDownload_clicked()

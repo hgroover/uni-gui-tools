@@ -29,18 +29,21 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     dlgconfig.cpp \
-    webdownload.cpp
+    webdownload.cpp \
+    basicfileviewer.cpp
 
 HEADERS += \
         mainwindow.h \
     dlgconfig.h \
     archive-manager-globals.h \
-    webdownload.h
+    webdownload.h \
+    basicfileviewer.h
 
 FORMS += \
         mainwindow.ui \
     dlgconfig.ui \
-    webdownload.ui
+    webdownload.ui \
+    basicfileviewer.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
