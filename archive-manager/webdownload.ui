@@ -26,7 +26,20 @@
      </widget>
     </item>
     <item>
-     <widget class="QListWidget" name="lstFiles"/>
+     <widget class="QListWidget" name="lstFiles">
+      <property name="selectionMode">
+       <enum>QAbstractItemView::ExtendedSelection</enum>
+      </property>
+      <property name="selectionBehavior">
+       <enum>QAbstractItemView::SelectRows</enum>
+      </property>
+      <property name="viewMode">
+       <enum>QListView::IconMode</enum>
+      </property>
+      <property name="sortingEnabled">
+       <bool>true</bool>
+      </property>
+     </widget>
     </item>
     <item>
      <widget class="QLabel" name="lblStatus">

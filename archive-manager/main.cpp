@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "archive-manager-globals.h"
 #include <QApplication>
 
 #include <QtGlobal>
@@ -45,12 +46,13 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     MainWindow w;
     a.setApplicationDisplayName("Archive Manager");
-    a.setApplicationVersion("1.0.1");
+    a.setApplicationVersion(MY_APP_VER);
     // Note that qInfo(), qWarning(), qCritical() etc. do not go to stdout / stderr
     // This will be visible on console only if started from git-bash - windows output requires using console api
     //std::cout << "Hello from main" << std::endl;
     //qWarning().noquote() << "Starting up" << argv[0];
     //qInfo().noquote() << "Using qInfo";
+    qInfo().noquote() << "Starting archive-manager v" MY_APP_VER;
     w.show();
 
     return a.exec();

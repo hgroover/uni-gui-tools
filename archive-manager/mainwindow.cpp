@@ -34,6 +34,9 @@ MainWindow::MainWindow(QWidget *parent) :
     on_BaseUrlChanged(settings.value("baseUrl").toString());
     connect(this, SIGNAL(updatedBaseUrl(QString)), &web_, SLOT(on_UpdatedBaseUrl(QString)));
     connect(this, SIGNAL(updatedLogFilespec(QString)), &web_, SLOT(on_UpdatedFilespec(QString)));
+    connect(this, SIGNAL(updatedLogDir(QString)), &web_, SLOT(on_UpdatedLogDir(QString)));
+    connect(&web_, SIGNAL(downloadCompleted(QString)), this, SLOT(on_DownloadCompleted(QString)));
+    emit updatedLogDir(logDir_);
     QTimer::singleShot(500, this, SLOT(on_Refresh()));
 }
 
@@ -41,6 +44,8 @@ MainWindow::~MainWindow()
 {
     disconnect(this, SIGNAL(updatedBaseUrl(QString)), &web_, SLOT(on_UpdatedBaseUrl(QString)));
     disconnect(this, SIGNAL(updatedLogFilespec(QString)), &web_, SLOT(on_UpdatedFilespec(QString)));
+    disconnect(this, SIGNAL(updatedLogDir(QString)), &web_, SLOT(on_UpdatedLogDir(QString)));
+    disconnect(&web_, SIGNAL(downloadCompleted(QString)), this, SLOT(on_DownloadCompleted(QString)));
     web_.close();
     delete ui;
 }
@@ -101,7 +106,9 @@ void MainWindow::on_LogDirChanged(QString logDir)
 {
     logDir_ = logDir;
     logListDirty_ = 1;
+    ui->txtLogDir->setText(logDir);
     QTimer::singleShot(500, this, SLOT(on_Refresh()));
+    emit updatedLogDir(logDir);
     qInfo().noquote() << "Dirty dir" << logDir;
 }
 
@@ -109,6 +116,7 @@ void MainWindow::on_LogFilespecChanged(QString logFilespec)
 {
     logFilespec_ = logFilespec;
     logListDirty_ = 1;
+    ui->txtFilespec->setText(logFilespec);
     QTimer::singleShot(500, this, SLOT(on_Refresh()));
     qInfo().noquote() << "Dirty spec" << logFilespec;
 }
@@ -194,6 +202,7 @@ void MainWindow::on_lstLogs_currentRowChanged(int currentRow)
     else
     {
         curLogFilename_ = ui->lstLogs->currentItem()->text();
+        qInfo().noquote() << "Inserted" << curLogFilename_;
         //QFileInfo fi(curLogFilename_);
         QString baseName(tarballBasename(curLogFilename_));
         QDir emptyDir(extractDir_ + '/' + baseName);
@@ -202,6 +211,7 @@ void MainWindow::on_lstLogs_currentRowChanged(int currentRow)
         ui->btnLogExtract->setEnabled(extractionValid_ && bashValid_ && extractScriptValid_ && !emptyDir.exists());
         ui->btnClear->setEnabled(emptyDir.exists());
         ui->btnView->setEnabled(emptyDir.exists());
+        qInfo().noquote() << "Updating view browser";
         populateViewBrowser(emptyDir.exists());
     }
 }
@@ -350,7 +360,22 @@ void MainWindow::on_btnDownload_clicked()
 
 void MainWindow::on_DownloadCompleted(QString filename)
 {
+    qInfo().noquote() << "Download completed" << filename;
     // filename should exist in downloads
     ui->lstLogs->insertItem(0, filename);
-    QTimer::singleShot(0, this, SLOT(on_lstLogs_currentRowChanged(0)));
+    QTimer::singleShot(100, this, SLOT(on_AssertFirstSelection()));
+    qInfo() << "deferred reselect";
+}
+
+// Used as a target for singleshot
+void MainWindow::on_AssertFirstSelection()
+{
+    qInfo().noquote() << "Asserting selection of row 0";
+    ui->lstLogs->setCurrentRow(0); // This will fire the event handler
+}
+
+bool MainWindow::hasLocalCopy(QString logFile)
+{
+    QList<QListWidgetItem*> a = ui->lstLogs->findItems(logFile, Qt::MatchExactly);
+    return a.size() > 0;
 }

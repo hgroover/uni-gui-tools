@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>513</width>
-    <height>549</height>
+    <width>597</width>
+    <height>583</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -136,7 +136,7 @@
          <property name="title">
           <string>Logs</string>
          </property>
-         <layout class="QVBoxLayout" name="verticalLayout_3" stretch="4,0,0">
+         <layout class="QVBoxLayout" name="verticalLayout_3" stretch="5,2,0">
           <item>
            <widget class="QListWidget" name="lstLogs"/>
           </item>
@@ -292,7 +292,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>513</width>
+     <width>597</width>
      <height>21</height>
     </rect>
    </property>

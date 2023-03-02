@@ -23,6 +23,10 @@ public:
 signals:
     void updatedBaseUrl(QString baseUrl);
     void updatedLogFilespec(QString filespec);
+    void updatedLogDir(QString logDir);
+
+public slots:
+    bool hasLocalCopy(QString logFile);
 
 protected slots:
     void on_LogDirChanged(QString logDir);
@@ -34,6 +38,7 @@ protected slots:
     void on_Refresh();
     void populateViewBrowser(bool extracted);
     void on_DownloadCompleted(QString filename);
+    void on_AssertFirstSelection();
 
 private slots:
     void on_pushButton_clicked();
