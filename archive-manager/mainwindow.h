@@ -22,6 +22,7 @@ public:
 
 signals:
     void updatedBaseUrl(QString baseUrl);
+    void updatedLogFilespec(QString filespec);
 
 protected slots:
     void on_LogDirChanged(QString logDir);

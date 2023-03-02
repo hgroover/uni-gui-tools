@@ -23,6 +23,7 @@ public:
 public slots:
     void on_UpdatedBaseUrl(QString baseUrl);
     void on_ReplyFinished(QNetworkReply *reply);
+    void on_UpdatedFilespec(QString filespec);
 
 private slots:
     void on_btnUnselect_clicked();
@@ -34,6 +35,7 @@ private slots:
 private:
     Ui::WebDownload *ui;
     QNetworkAccessManager net_;
+    QString fileFilter_;
 };
 
 #endif // WEBDOWNLOAD_H

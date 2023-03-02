@@ -31,15 +31,16 @@ MainWindow::MainWindow(QWidget *parent) :
     //ui->txtGitDir->setText(gitDir_);
     on_ExtractionDirChanged(settings.value("extractionDir").toString());
     on_ExtractScriptChanged(settings.value("extractScript").toString());
-    baseUrl_ = settings.value("baseUrl").toString();
-    ui->txtBaseUrl->setText(baseUrl_);
+    on_BaseUrlChanged(settings.value("baseUrl").toString());
     connect(this, SIGNAL(updatedBaseUrl(QString)), &web_, SLOT(on_UpdatedBaseUrl(QString)));
+    connect(this, SIGNAL(updatedLogFilespec(QString)), &web_, SLOT(on_UpdatedFilespec(QString)));
     QTimer::singleShot(500, this, SLOT(on_Refresh()));
 }
 
 MainWindow::~MainWindow()
 {
     disconnect(this, SIGNAL(updatedBaseUrl(QString)), &web_, SLOT(on_UpdatedBaseUrl(QString)));
+    disconnect(this, SIGNAL(updatedLogFilespec(QString)), &web_, SLOT(on_UpdatedFilespec(QString)));
     web_.close();
     delete ui;
 }
@@ -173,6 +174,7 @@ void MainWindow::on_Refresh()
     {
         ui->lstLogs->addItem(a[n]);
     }
+    emit updatedLogFilespec(logFilespec_);
 }
 
 void MainWindow::on_lstLogs_currentRowChanged(int currentRow)
