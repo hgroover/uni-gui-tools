@@ -41,8 +41,6 @@ protected slots:
     void on_AssertFirstSelection();
 
 private slots:
-    void on_pushButton_clicked();
-
     void on_btnQuit_clicked();
 
     void on_btnConfigure_clicked();

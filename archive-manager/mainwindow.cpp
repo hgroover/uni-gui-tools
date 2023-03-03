@@ -30,6 +30,9 @@ MainWindow::MainWindow(QWidget *parent) :
     on_GitDirChanged(settings.value("gitDir", "c:/Program Files/Git").toString());
     //gitDir_ = settings.value("gitDir");
     //ui->txtGitDir->setText(gitDir_);
+    setWindowTitle(windowTitle() + " v" MY_APP_VER);
+    restoreGeometry(settings.value("mw_geometry").toByteArray());
+    restoreState(settings.value("mw_state").toByteArray());
     on_ExtractionDirChanged(settings.value("extractionDir").toString());
     on_ExtractScriptChanged(settings.value("extractScript").toString());
     on_BaseUrlChanged(settings.value("baseUrl").toString());
@@ -51,30 +54,11 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_pushButton_clicked()
-{
-    qInfo().noquote() << "Testing";
-    QString gitPath("\"");
-    gitPath += gitShellPath_;
-    gitPath += "\" -c ./foo.sh";
-    int bashRes = QProcess::execute(gitPath);
-    // execute() returns -1 if crash, -2 if cannot start, else ok
-    switch (bashRes)
-    {
-    case -1:
-        qCritical() << "Program crashed";
-        break;
-    case -2:
-        qCritical().noquote() << "Failed to start" << gitPath;
-        break;
-    default:
-        qInfo().noquote() << "Result of" << gitPath << ":" << bashRes;
-        break;
-    }
-}
-
 void MainWindow::on_btnQuit_clicked()
 {
+    MYQSETTINGS(settings);
+    settings.setValue("mw_geometry", saveGeometry());
+    settings.setValue("mw_state", saveState());
     close();
 }
 

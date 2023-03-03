@@ -1,5 +1,6 @@
 #include "webdownload.h"
 #include "ui_webdownload.h"
+#include "archive-manager-globals.h"
 
 #include "mainwindow.h"
 
@@ -12,6 +13,9 @@ WebDownload::WebDownload(QWidget *parent) :
     net_()
 {
     ui->setupUi(this);
+    MYQSETTINGS(settings);
+    restoreGeometry(settings.value("dw_geometry").toByteArray());
+    restoreState(settings.value("dw_state").toByteArray());
 }
 
 WebDownload::~WebDownload()
@@ -40,6 +44,9 @@ void WebDownload::on_btnDone_clicked()
         qInfo().noquote() << '[' << n << ']' << selected[n]->text();
         beginDownload(selected[n]->text().mid(2));
     }
+    MYQSETTINGS(settings);
+    settings.setValue("dw_geometry", saveGeometry());
+    settings.setValue("dw_state", saveState());
     hide();
     if (parent() != nullptr)
     {

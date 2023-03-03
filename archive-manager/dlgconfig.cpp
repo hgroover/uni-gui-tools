@@ -10,6 +10,9 @@ dlgConfig::dlgConfig(QWidget *parent) :
     ui(new Ui::dlgConfig)
 {
     ui->setupUi(this);
+    MYQSETTINGS(settings);
+    restoreGeometry(settings.value("cw_geometry").toByteArray());
+    //restoreState(settings.value("cw_state").toByteArray());
 }
 
 dlgConfig::~dlgConfig()
@@ -21,6 +24,7 @@ void dlgConfig::on_buttonBox_accepted()
 {
     // Save changed values
     MYQSETTINGS(settings);
+    settings.setValue("cw_geometry", saveGeometry());
     settings.setValue("logDir", ui->txtLogDir->text());
     settings.setValue("logFilespec", ui->txtLogFilespec->text());
     settings.setValue("gitDir", ui->txtGitDir->text());
