@@ -206,6 +206,11 @@ void MainWindow::on_btnLogExtract_clicked()
     QDir parentDir(extractDir_);
     if (parentDir.mkpath(curLogExtractDir_))
     {
+        ui->btnLogExtract->setEnabled(false);
+        ui->txtItemDetails->setText("<html><p>Please wait... extraction in progress<p></html>");
+        QApplication::processEvents();
+        QApplication::processEvents();
+        QApplication::processEvents();
         qInfo().noquote() << "Extracting" << curLogFilename_ << "to" << curLogExtractDir_;
         QProcess pExtract(this);
         // You would think this would work, but the script will still run in the app dir unless we explicitly change
@@ -220,15 +225,23 @@ void MainWindow::on_btnLogExtract_clicked()
         gitPath += ' ';
         gitPath += bashify(curLogTarballPath_);
         gitPath += '\"';
+        QApplication::processEvents();
+        QApplication::processEvents();
+        QApplication::processEvents();
         int res = pExtract.execute(gitPath);
+        QApplication::processEvents();
+        QApplication::processEvents();
+        QApplication::processEvents();
         // execute() returns -1 if crash, -2 if cannot start, else ok
         switch (res)
         {
         case -1:
             qCritical() << "Program crashed";
+            ui->txtItemDetails->setText("Critical error while extracting");
             break;
         case -2:
             qCritical().noquote() << "Failed to start" << gitPath;
+            ui->txtItemDetails->setText("Failed to run extraction script");
             break;
         case 0:
             qInfo().noquote() << "Success, cwd" << pExtract.workingDirectory();
@@ -236,6 +249,7 @@ void MainWindow::on_btnLogExtract_clicked()
             break;
         default:
             qInfo().noquote() << "Script failed - result of" << gitPath << ":" << res;
+            ui->txtItemDetails->setText("Failed to extract. current git path:" + gitPath);
             break;
         }
         QDir::setCurrent(appCurrentDir);
@@ -314,31 +328,55 @@ void MainWindow::on_btnClear_clicked()
 void MainWindow::populateViewBrowser(bool extracted)
 {
     QString html;
+    const int shortContentSize = 80;
     if (extracted)
     {
         // If there's an insight script, run it otherwise default action is here
         html = "<h5>" + curLogExtractDir_ + "</h5>";
-        html += "<table><thead><tr><th>File</th><th>Size</th></tr></thead>\n";
+        html += "<table padding=\"1\"><thead><tr><th align=\"left\">File</th><th>Size</th><th align=\"left\">Details</th><</tr></thead>\n";
         html += "<tbody>\n";
         QDir d(curLogExtractDir_);
         QFileInfoList a = d.entryInfoList(QDir::NoDotAndDotDot|QDir::AllEntries);
         for (int n = 0; n < a.length(); n++)
         {
+            bool showContents = false;
+            bool showViewLink = a[n].isFile();
+            QString fileContents("&nbsp;&nbsp;&nbsp;");
+            if (showViewLink && a[n].size() <= shortContentSize)
+            {
+                // If a single line, display it
+                QFile f(a[n].filePath());
+                if (f.open(QIODevice::ReadOnly))
+                {
+                    QList<QByteArray> a2 = f.readAll().split('\n');
+                    if (a2.size()<=2)
+                    {
+                        showContents = true;
+                        fileContents += a2[0];
+                        showViewLink = false;
+                    }
+                    else
+                    {
+                        fileContents += QString().sprintf("(%lld lines)", a[n].size());
+                        //qInfo().noquote() << "Not showing" << a[n].size() << "byte file" << a[n].fileName() << ", lines" << a2.size();
+                    }
+                }
+            }
             html += "<tr>";
                 html += "<td>";
-                    if (a[n].isFile())
+                    if (showViewLink)
                     {
                         html += "<a href=\"view:";
                         html += a[n].fileName();
                         html += "\">";
                     }
                     html += a[n].fileName();
-                    if (a[n].isFile())
+                    if (showViewLink)
                     {
                         html += "</a>";
                     }
                 html += "</td>";
-                html += "<td>";
+                html += "<td align=\"right\">";
                     if (a[n].isFile())
                     {
                         html += QString().sprintf("%lld", a[n].size());
@@ -347,6 +385,9 @@ void MainWindow::populateViewBrowser(bool extracted)
                     {
                         html += "&lt;DIR&gt;";
                     }
+                html += "</td>";
+                html += "<td align=\"left\">";
+                    html += fileContents;
                 html += "</td>";
             html += "</tr>\n";
         }
@@ -373,10 +414,22 @@ void MainWindow::on_txtItemDetails_anchorClicked(const QUrl &arg1)
     QString verb(s.left(colonPos));
     QString verbObject(s.mid(colonPos+1));
     qInfo().noquote() << "Performing" << verb << "on" << verbObject; // << "with" << curLogExtractDir_ << "filename" << curLogFilename_;
-    BasicFileViewer *view = new BasicFileViewer(this, curLogExtractDir_, verbObject);
-    view->setModal(false);
-    view->showNormal();
-    setFocus();
+    if (verb == "extract")
+    {
+        qInfo().noquote() << "Extracting" << verbObject << "curLogFilename_" << curLogFilename_;
+        QTimer::singleShot(0, this, SLOT(on_btnLogExtract_clicked()));
+    }
+    else if (verb == "view")
+    {
+        BasicFileViewer *view = new BasicFileViewer(this, curLogExtractDir_, verbObject);
+        view->setModal(false);
+        view->showNormal();
+        setFocus();
+    }
+    else
+    {
+        qWarning().noquote() << "Don't know how to" << verb << verbObject;
+    }
 }
 
 void MainWindow::on_btnDownload_clicked()
