@@ -16,12 +16,8 @@ public:
     ~dlgConfig();
 
 public slots:
-    void setLogDir(QString logDir);
-    void setLogFilespec(QString logFilespec);
-    void setGitDir(QString gitDir);
-    void setExtractionDir(QString extractionDir);
-    void setExtractScript(QString extractScript);
-    void setBaseUrl(QString baseUrl);
+    void loadValues();
+    void saveValues();
 
 signals:
     void updatedLogDir(QString logDir);
@@ -30,6 +26,9 @@ signals:
     void updatedExtractionDir(QString extractionDir);
     void updatedExtractScript(QString extractScript);
     void updatedBaseUrl(QString baseUrl);
+    // Value changes in View tab
+    void updatedViewExternalViewerTrigger(int fileSize);
+    void updatedViewExternalViewer(QString appPath);
 
 private slots:
     void on_buttonBox_accepted();
@@ -41,6 +40,8 @@ private slots:
     void on_lblExtractDir_linkActivated(const QString &link);
 
     void on_lblExtractScript_linkActivated(const QString &link);
+
+    void on_lblViewExternalViewer_linkActivated(const QString &link);
 
 private:
     Ui::dlgConfig *ui;

@@ -35,6 +35,8 @@ protected slots:
     void on_ExtractionDirChanged(QString extractionDir);
     void on_ExtractScriptChanged(QString extractScript);
     void on_BaseUrlChanged(QString baseUrl);
+    void on_ViewExternalSizeTrigger(int fileSize);
+    void on_ViewExternalViewer(QString viewerApp);
     void on_Refresh();
     void populateViewBrowser(bool extracted);
     void on_DownloadCompleted(QString filename);
@@ -62,6 +64,8 @@ private slots:
 private:
     Ui::MainWindow *ui;
     WebDownload web_;
+
+    // Set in config dialog
     QString logDir_;
     QString logFilespec_;
     QString gitDir_;
@@ -70,6 +74,9 @@ private:
     QString extractDir_;
     QString extractScript_;
     QString baseUrl_;
+    int viewExternalViewTrigger_;
+    QString viewExternalViewerApp_;
+
     bool extractionValid_;
     bool bashValid_;
     bool extractScriptValid_;

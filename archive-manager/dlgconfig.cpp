@@ -4,6 +4,7 @@
 
 #include <QSettings>
 #include <QFileDialog>
+#include <QDebug>
 
 dlgConfig::dlgConfig(QWidget *parent) :
     QDialog(parent),
@@ -22,15 +23,7 @@ dlgConfig::~dlgConfig()
 
 void dlgConfig::on_buttonBox_accepted()
 {
-    // Save changed values
-    MYQSETTINGS(settings);
-    settings.setValue("cw_geometry", saveGeometry());
-    settings.setValue("logDir", ui->txtLogDir->text());
-    settings.setValue("logFilespec", ui->txtLogFilespec->text());
-    settings.setValue("gitDir", ui->txtGitDir->text());
-    settings.setValue("extractionDir", ui->txtExtractionDir->text());
-    settings.setValue("extractScript", ui->txtExtractScript->text());
-    settings.setValue("baseUrl", ui->txtBaseUrl->text());
+    saveValues();
     // Notify
     emit updatedLogDir(ui->txtLogDir->text());
     emit updatedLogFilespec(ui->txtLogFilespec->text());
@@ -38,6 +31,36 @@ void dlgConfig::on_buttonBox_accepted()
     emit updatedExtractionDir(ui->txtExtractionDir->text());
     emit updatedExtractScript(ui->txtExtractScript->text());
     emit updatedBaseUrl(ui->txtBaseUrl->text());
+    emit updatedViewExternalViewer(ui->txtViewExternalViewer->text());
+    emit updatedViewExternalViewerTrigger(ui->txtViewSizeTrigger->text().toInt());
+}
+
+void dlgConfig::saveValues()
+{
+    // Save changed values
+    MYQSETTINGS(settings);
+    settings.setValue("cw_geometry", saveGeometry());
+    settings.setValue("logDir", ui->txtLogDir->text());
+    settings.setValue("logFilespec", ui->txtLogFilespec->text());
+    settings.setValue("gitDir", ui->txtGitDir->text());
+    settings.setValue("extractionDir", ui->txtExtractionDir->text());
+    settings.setValue("extractionScript", ui->txtExtractScript->text());
+    settings.setValue("baseUrl", ui->txtBaseUrl->text());
+    settings.setValue("viewSizeTrigger", ui->txtViewSizeTrigger->text());
+    settings.setValue("viewExternalViewer", ui->txtViewExternalViewer->text());
+}
+
+void dlgConfig::loadValues()
+{
+    MYQSETTINGS(settings);
+    ui->txtLogDir->setText(settings.value("logDir").toString());
+    ui->txtLogFilespec->setText(settings.value("logFilespec").toString());
+    ui->txtGitDir->setText(settings.value("gitDir").toString());
+    ui->txtExtractionDir->setText(settings.value("extractionDir").toString());
+    ui->txtExtractScript->setText(settings.value("extractionScript").toString());
+    ui->txtBaseUrl->setText(settings.value("baseUrl").toString());
+    ui->txtViewSizeTrigger->setText(settings.value("viewSizeTrigger").toString());
+    ui->txtViewExternalViewer->setText(settings.value("viewExternalViewer").toString());
 }
 
 void dlgConfig::on_lblLogdir_linkActivated(const QString &link)
@@ -55,35 +78,6 @@ void dlgConfig::on_lblLogdir_linkActivated(const QString &link)
     }
 }
 
-void dlgConfig::setGitDir(QString gitDir)
-{
-    ui->txtGitDir->setText(gitDir);
-}
-
-void dlgConfig::setLogDir(QString logDir)
-{
-    ui->txtLogDir->setText(logDir);
-}
-
-void dlgConfig::setLogFilespec(QString logFilespec)
-{
-    ui->txtLogFilespec->setText(logFilespec);
-}
-
-void dlgConfig::setExtractionDir(QString extractionDir)
-{
-    ui->txtExtractionDir->setText(extractionDir);
-}
-
-void dlgConfig::setExtractScript(QString extractScript)
-{
-    ui->txtExtractScript->setText(extractScript);
-}
-
-void dlgConfig::setBaseUrl(QString baseUrl)
-{
-    ui->txtBaseUrl->setText(baseUrl);
-}
 
 void dlgConfig::on_lblGitDir_linkActivated(const QString &link)
 {
@@ -122,5 +116,22 @@ void dlgConfig::on_lblExtractScript_linkActivated(const QString &link)
     {
         MYQSETTINGS(settings);
         ui->txtExtractScript->setText(settings.value("extractScript").toString());
+    }
+}
+
+void dlgConfig::on_lblViewExternalViewer_linkActivated(const QString &link)
+{
+    // Use common picker
+    if (link == "select")
+    {
+        ui->txtViewExternalViewer->setText(QFileDialog::getOpenFileName(this, "Select external program to view large files"));
+    }
+    else if (link == "clear")
+    {
+        ui->txtViewExternalViewer->setText("");
+    }
+    else
+    {
+        qWarning().noquote() << "Unexpected link" << link;
     }
 }

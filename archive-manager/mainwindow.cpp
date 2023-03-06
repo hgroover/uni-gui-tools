@@ -34,7 +34,7 @@ MainWindow::MainWindow(QWidget *parent) :
     restoreGeometry(settings.value("mw_geometry").toByteArray());
     restoreState(settings.value("mw_state").toByteArray());
     on_ExtractionDirChanged(settings.value("extractionDir").toString());
-    on_ExtractScriptChanged(settings.value("extractScript").toString());
+    on_ExtractScriptChanged(settings.value("extractionScript").toString());
     on_BaseUrlChanged(settings.value("baseUrl").toString());
     connect(this, SIGNAL(updatedBaseUrl(QString)), &web_, SLOT(on_UpdatedBaseUrl(QString)));
     connect(this, SIGNAL(updatedLogFilespec(QString)), &web_, SLOT(on_UpdatedFilespec(QString)));
@@ -65,18 +65,15 @@ void MainWindow::on_btnQuit_clicked()
 void MainWindow::on_btnConfigure_clicked()
 {
     dlgConfig dlg(this);
+    dlg.loadValues();
     connect( &dlg, SIGNAL(updatedLogDir(QString)), this, SLOT(on_LogDirChanged(QString)));
     connect( &dlg, SIGNAL(updatedLogFilespec(QString)), this, SLOT(on_LogFilespecChanged(QString)));
     connect( &dlg, SIGNAL(updatedGitDir(QString)), this, SLOT(on_GitDirChanged(QString)));
     connect( &dlg, SIGNAL(updatedExtractionDir(QString)), this, SLOT(on_ExtractionDirChanged(QString)));
     connect( &dlg, SIGNAL(updatedExtractScript(QString)), this, SLOT(on_ExtractScriptChanged(QString)));
     connect( &dlg, SIGNAL(updatedBaseUrl(QString)), this, SLOT(on_BaseUrlChanged(QString)));
-    dlg.setGitDir(gitDir_);
-    dlg.setLogDir(logDir_);
-    dlg.setLogFilespec(logFilespec_);
-    dlg.setExtractionDir(extractDir_);
-    dlg.setExtractScript(extractScript_);
-    dlg.setBaseUrl(baseUrl_);
+    connect( &dlg, SIGNAL(updatedViewExternalViewerTrigger(int)), this, SLOT(on_ViewExternalSizeTrigger(int)));
+    connect( &dlg, SIGNAL(updatedViewExternalViewer(QString)), this, SLOT(on_ViewExternalViewer(QString)));
     int dlgRes = dlg.exec();
     disconnect( &dlg, SIGNAL(updatedLogDir(QString)), this, SLOT(on_LogDirChanged(QString)));
     disconnect( &dlg, SIGNAL(updatedLogFilespec(QString)), this, SLOT(on_LogFilespecChanged(QString)));
@@ -84,6 +81,8 @@ void MainWindow::on_btnConfigure_clicked()
     disconnect( &dlg, SIGNAL(updatedExtractionDir(QString)), this, SLOT(on_ExtractionDirChanged(QString)));
     disconnect( &dlg, SIGNAL(updatedExtractScript(QString)), this, SLOT(on_ExtractScriptChanged(QString)));
     disconnect( &dlg, SIGNAL(updatedBaseUrl(QString)), this, SLOT(on_BaseUrlChanged(QString)));
+    disconnect( &dlg, SIGNAL(updatedViewExternalViewerTrigger(int)), this, SLOT(on_ViewExternalSizeTrigger(int)));
+    disconnect( &dlg, SIGNAL(updatedViewExternalViewer(QString)), this, SLOT(on_ViewExternalViewer(QString)));
     qInfo() << "config returned" << dlgRes;
 }
 
@@ -142,6 +141,16 @@ void MainWindow::on_BaseUrlChanged(QString baseUrl)
     ui->txtBaseUrl->setText(baseUrl);
     ui->btnDownload->setEnabled(!baseUrl.isEmpty());
     emit updatedBaseUrl(baseUrl);
+}
+
+void MainWindow::on_ViewExternalSizeTrigger(int fileSize)
+{
+    viewExternalViewTrigger_ = fileSize;
+}
+
+void MainWindow::on_ViewExternalViewer(QString viewerApp)
+{
+    viewExternalViewerApp_ = viewerApp;
 }
 
 void MainWindow::on_btnRefresh_clicked()
@@ -421,10 +430,22 @@ void MainWindow::on_txtItemDetails_anchorClicked(const QUrl &arg1)
     }
     else if (verb == "view")
     {
-        BasicFileViewer *view = new BasicFileViewer(this, curLogExtractDir_, verbObject);
-        view->setModal(false);
-        view->showNormal();
-        setFocus();
+        QDir d(curLogExtractDir_);
+        QFileInfo fi(d.filePath(verbObject));
+        if (viewExternalViewTrigger_ >= 0 && fi.size() >= viewExternalViewTrigger_ && viewExternalViewerApp_.length() > 0)
+        {
+            qInfo().noquote() << "Size triggers external viewer:" << fi.size() << "bytes in" << verbObject;
+            int res = QProcess::execute('"' + viewExternalViewerApp_ + "\" \"" + fi.filePath() + '"');
+            qInfo().noquote() << "Execute returned" << res;
+        }
+        else
+        {
+            qInfo().noquote() << "Size" << fi.size() << "for" << fi.filePath() << "under limit" << viewExternalViewTrigger_;
+            BasicFileViewer *view = new BasicFileViewer(this, curLogExtractDir_, verbObject);
+            view->setModal(false);
+            view->showNormal();
+            setFocus();
+        }
     }
     else
     {

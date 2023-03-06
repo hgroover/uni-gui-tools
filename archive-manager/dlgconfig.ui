@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>479</width>
+    <height>315</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,103 +15,158 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QFormLayout" name="formLayout">
-     <item row="0" column="0">
-      <widget class="QLabel" name="lblLogdir">
-       <property name="toolTip">
-        <string>Log directory - use links to change or reset to last saved</string>
-       </property>
-       <property name="text">
-        <string>Log dir (&lt;a href=&quot;edit&quot;&gt;chg&lt;/a&gt;/&lt;a href=&quot;clear&quot;&gt;rst&lt;/a&gt;)</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLineEdit" name="txtLogDir">
-       <property name="readOnly">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="lblLogFilespec">
-       <property name="text">
-        <string>Log filespec</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QLineEdit" name="txtLogFilespec"/>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="lblGitDir">
-       <property name="toolTip">
-        <string>Use change or reset link to select Git bash install dir</string>
-       </property>
-       <property name="text">
-        <string>Git bash dir (&lt;a href=&quot;change&quot;&gt;chg&lt;/a&gt;/&lt;a href=&quot;reset&quot;&gt;rst&lt;/a&gt;)</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="QLineEdit" name="txtGitDir">
-       <property name="toolTip">
-        <string>Install directory for git bash (should contain bin). Use change or reset hyperlink to change.</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="lblExtractDir">
-       <property name="toolTip">
-        <string>Change or reset extraction dir using hyperlink</string>
-       </property>
-       <property name="text">
-        <string>Extract dir (&lt;a href=&quot;change&quot;&gt;chg&lt;/a&gt;/&lt;a href=&quot;reset&quot;&gt;rst&lt;/a&gt;)</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <widget class="QLineEdit" name="txtExtractionDir">
-       <property name="toolTip">
-        <string>Where to extract logs</string>
-       </property>
-       <property name="readOnly">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="0">
-      <widget class="QLabel" name="lblExtractScript">
-       <property name="text">
-        <string>Extract script (&lt;a href=&quot;change&quot;&gt;chg&lt;/a&gt;/&lt;a href=&quot;reset&quot;&gt;rst&lt;/a&gt;)</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="1">
-      <widget class="QLineEdit" name="txtExtractScript">
-       <property name="toolTip">
-        <string>Bash script to extract archive into current directory</string>
-       </property>
-       <property name="readOnly">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="0">
-      <widget class="QLabel" name="lblBaseUrl">
-       <property name="text">
-        <string>Base url</string>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="1">
-      <widget class="QLineEdit" name="txtBaseUrl">
-       <property name="toolTip">
-        <string>Base url for http listing of archives to download</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="tabData">
+      <attribute name="title">
+       <string>Data</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <layout class="QFormLayout" name="formLayout">
+         <item row="0" column="0">
+          <widget class="QLabel" name="lblLogdir">
+           <property name="toolTip">
+            <string>Log directory - use links to change or reset to last saved</string>
+           </property>
+           <property name="text">
+            <string>Log dir (&lt;a href=&quot;edit&quot;&gt;chg&lt;/a&gt;/&lt;a href=&quot;clear&quot;&gt;rst&lt;/a&gt;)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="txtLogDir">
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="lblLogFilespec">
+           <property name="text">
+            <string>Log filespec</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLineEdit" name="txtLogFilespec"/>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="lblGitDir">
+           <property name="toolTip">
+            <string>Use change or reset link to select Git bash install dir</string>
+           </property>
+           <property name="text">
+            <string>Git bash dir (&lt;a href=&quot;change&quot;&gt;chg&lt;/a&gt;/&lt;a href=&quot;reset&quot;&gt;rst&lt;/a&gt;)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLineEdit" name="txtGitDir">
+           <property name="toolTip">
+            <string>Install directory for git bash (should contain bin). Use change or reset hyperlink to change.</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="lblExtractDir">
+           <property name="toolTip">
+            <string>Change or reset extraction dir using hyperlink</string>
+           </property>
+           <property name="text">
+            <string>Extract dir (&lt;a href=&quot;change&quot;&gt;chg&lt;/a&gt;/&lt;a href=&quot;reset&quot;&gt;rst&lt;/a&gt;)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QLineEdit" name="txtExtractionDir">
+           <property name="toolTip">
+            <string>Where to extract logs</string>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="lblExtractScript">
+           <property name="text">
+            <string>Extract script (&lt;a href=&quot;change&quot;&gt;chg&lt;/a&gt;/&lt;a href=&quot;reset&quot;&gt;rst&lt;/a&gt;)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QLineEdit" name="txtExtractScript">
+           <property name="toolTip">
+            <string>Bash script to extract archive into current directory</string>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="lblBaseUrl">
+           <property name="text">
+            <string>Base url</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QLineEdit" name="txtBaseUrl">
+           <property name="toolTip">
+            <string>Base url for http listing of archives to download</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tabViewer">
+      <attribute name="title">
+       <string>Viewer</string>
+      </attribute>
+      <layout class="QFormLayout" name="formLayout_3">
+       <item row="0" column="0">
+        <widget class="QLabel" name="lblViewerSize">
+         <property name="text">
+          <string>Size trigger</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="txtViewSizeTrigger">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;For files with sizes above this value (bytes),&lt;br/&gt;use external viewer. To use external viewer&lt;/p&gt;&lt;p&gt;for all files, enter 0. To disable external viewer,&lt;/p&gt;&lt;p&gt;enter -1.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>256000</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="lblViewExternalViewer">
+         <property name="text">
+          <string>External viewer (&lt;a href=&quot;select&quot;&gt;select&lt;/a&gt;)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLineEdit" name="txtViewExternalViewer">
+         <property name="toolTip">
+          <string>Path to external viewer for files above size trigger</string>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">

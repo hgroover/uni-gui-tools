@@ -3,7 +3,7 @@
 
 #define MYQSETTINGS(instanceName) QSettings instanceName("archive-manager.ini", QSettings::IniFormat)
 
-#define MY_APP_VER "1.0.4"
+#define MY_APP_VER "1.0.5"
 
 
 #endif // ARCHIVEMANAGERGLOBALS_H
