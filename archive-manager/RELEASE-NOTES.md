@@ -3,6 +3,7 @@
 ## 1.0.6 12-Mar-2023
 
 - fixed: external viewer parameters are not read on startup
+- verified: extract link works
 
 ## Previous versions
 
