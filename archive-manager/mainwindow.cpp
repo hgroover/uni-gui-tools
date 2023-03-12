@@ -59,6 +59,11 @@ void MainWindow::on_btnQuit_clicked()
     MYQSETTINGS(settings);
     settings.setValue("mw_geometry", saveGeometry());
     settings.setValue("mw_state", saveState());
+    // This works as expected on a single-monitor setup
+    qDebug().noquote() << "Geometry" << saveGeometry().toHex();
+    // No difference, as expected
+    //qDebug().noquote() << "Superclass" << static_cast<QMainWindow*>(this)->saveGeometry().toHex();
+    qDebug().noquote() << "Title bar height" << QApplication::style()->pixelMetric(QStyle::PM_TitleBarHeight);
     close();
 }
 

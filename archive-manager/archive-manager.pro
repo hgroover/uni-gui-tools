@@ -51,4 +51,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 DISTFILES += \
-    README.md
+    README.md \
+    DOCUMENTATION.md \
+    TODO.md \
+    RELEASE-NOTES.md \
+    PLUGINS.md

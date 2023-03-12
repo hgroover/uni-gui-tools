@@ -43,6 +43,8 @@ protected slots:
     void on_AssertFirstSelection();
 
 private slots:
+    // Where we save state/position. Ideally use installEventFilter() and get resize and change state events
+    // so we can handle user closing window via X in title bar
     void on_btnQuit_clicked();
 
     void on_btnConfigure_clicked();
