@@ -2,6 +2,8 @@
 
 ## 1.0.6 12-Mar-2023
 
+- fixed: external viewer parameters are not read on startup
+
 ## Previous versions
 
 ### 1.0.5 06-Mar-2023

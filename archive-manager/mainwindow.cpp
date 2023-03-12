@@ -22,20 +22,11 @@ MainWindow::MainWindow(QWidget *parent) :
     logListDirty_(1)
 {
     ui->setupUi(this);
+    on_InitialLoad();
     MYQSETTINGS(settings);
-    logDir_ = settings.value("logDir").toString();
-    logFilespec_ = settings.value("logFilespec").toString();
-    ui->txtLogDir->setText(logDir_);
-    ui->txtFilespec->setText(logFilespec_);
-    on_GitDirChanged(settings.value("gitDir", "c:/Program Files/Git").toString());
-    //gitDir_ = settings.value("gitDir");
-    //ui->txtGitDir->setText(gitDir_);
     setWindowTitle(windowTitle() + " v" MY_APP_VER);
-    restoreGeometry(settings.value("mw_geometry").toByteArray());
-    restoreState(settings.value("mw_state").toByteArray());
-    on_ExtractionDirChanged(settings.value("extractionDir").toString());
-    on_ExtractScriptChanged(settings.value("extractionScript").toString());
-    on_BaseUrlChanged(settings.value("baseUrl").toString());
+    restoreGeometry(settings.value(cfg_mw_geometry).toByteArray());
+    restoreState(settings.value(cfg_mw_state).toByteArray());
     connect(this, SIGNAL(updatedBaseUrl(QString)), &web_, SLOT(on_UpdatedBaseUrl(QString)));
     connect(this, SIGNAL(updatedLogFilespec(QString)), &web_, SLOT(on_UpdatedFilespec(QString)));
     connect(this, SIGNAL(updatedLogDir(QString)), &web_, SLOT(on_UpdatedLogDir(QString)));
@@ -57,8 +48,8 @@ MainWindow::~MainWindow()
 void MainWindow::on_btnQuit_clicked()
 {
     MYQSETTINGS(settings);
-    settings.setValue("mw_geometry", saveGeometry());
-    settings.setValue("mw_state", saveState());
+    settings.setValue(cfg_mw_geometry, saveGeometry());
+    settings.setValue(cfg_mw_state, saveState());
     // This works as expected on a single-monitor setup
     qDebug().noquote() << "Geometry" << saveGeometry().toHex();
     // No difference, as expected
@@ -67,10 +58,28 @@ void MainWindow::on_btnQuit_clicked()
     close();
 }
 
+void MainWindow::on_InitialLoad()
+{
+    // Load vars from settings into member vars
+    MYQSETTINGS(settings);
+    // Both of these need to get set without refreshing the log list
+    logDir_ = settings.value(cfg_logDir).toString();
+    logFilespec_ = settings.value(cfg_logFilespec).toString();
+    ui->txtLogDir->setText(logDir_);
+    ui->txtFilespec->setText(logFilespec_);
+    on_GitDirChanged(settings.value(cfg_gitDir, "c:/Program Files/Git").toString());
+    on_ExtractionDirChanged(settings.value(cfg_extractionDir).toString());
+    on_ExtractScriptChanged(settings.value(cfg_extractionScript).toString());
+    on_BaseUrlChanged(settings.value(cfg_baseUrl).toString());
+    on_ViewExternalSizeTrigger(settings.value(cfg_viewSizeTrigger).toInt());
+    on_ViewExternalViewer(settings.value(cfg_viewExternalViewer).toString());
+}
+
 void MainWindow::on_btnConfigure_clicked()
 {
     dlgConfig dlg(this);
     dlg.loadValues();
+    // These need to be echoed in initial load
     connect( &dlg, SIGNAL(updatedLogDir(QString)), this, SLOT(on_LogDirChanged(QString)));
     connect( &dlg, SIGNAL(updatedLogFilespec(QString)), this, SLOT(on_LogFilespecChanged(QString)));
     connect( &dlg, SIGNAL(updatedGitDir(QString)), this, SLOT(on_GitDirChanged(QString)));

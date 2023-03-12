@@ -12,8 +12,8 @@ dlgConfig::dlgConfig(QWidget *parent) :
 {
     ui->setupUi(this);
     MYQSETTINGS(settings);
-    restoreGeometry(settings.value("cw_geometry").toByteArray());
-    //restoreState(settings.value("cw_state").toByteArray());
+    restoreGeometry(settings.value(cfg_cw_geometry).toByteArray());
+    //restoreState(settings.value(cfg_cw_state).toByteArray());
 }
 
 dlgConfig::~dlgConfig()
@@ -39,28 +39,28 @@ void dlgConfig::saveValues()
 {
     // Save changed values
     MYQSETTINGS(settings);
-    settings.setValue("cw_geometry", saveGeometry());
-    settings.setValue("logDir", ui->txtLogDir->text());
-    settings.setValue("logFilespec", ui->txtLogFilespec->text());
-    settings.setValue("gitDir", ui->txtGitDir->text());
-    settings.setValue("extractionDir", ui->txtExtractionDir->text());
-    settings.setValue("extractionScript", ui->txtExtractScript->text());
-    settings.setValue("baseUrl", ui->txtBaseUrl->text());
-    settings.setValue("viewSizeTrigger", ui->txtViewSizeTrigger->text());
-    settings.setValue("viewExternalViewer", ui->txtViewExternalViewer->text());
+    settings.setValue(cfg_cw_geometry, saveGeometry());
+    settings.setValue(cfg_logDir, ui->txtLogDir->text());
+    settings.setValue(cfg_logFilespec, ui->txtLogFilespec->text());
+    settings.setValue(cfg_gitDir, ui->txtGitDir->text());
+    settings.setValue(cfg_extractionDir, ui->txtExtractionDir->text());
+    settings.setValue(cfg_extractionScript, ui->txtExtractScript->text());
+    settings.setValue(cfg_baseUrl, ui->txtBaseUrl->text());
+    settings.setValue(cfg_viewSizeTrigger, ui->txtViewSizeTrigger->text());
+    settings.setValue(cfg_viewExternalViewer, ui->txtViewExternalViewer->text());
 }
 
 void dlgConfig::loadValues()
 {
     MYQSETTINGS(settings);
-    ui->txtLogDir->setText(settings.value("logDir").toString());
-    ui->txtLogFilespec->setText(settings.value("logFilespec").toString());
-    ui->txtGitDir->setText(settings.value("gitDir").toString());
-    ui->txtExtractionDir->setText(settings.value("extractionDir").toString());
-    ui->txtExtractScript->setText(settings.value("extractionScript").toString());
-    ui->txtBaseUrl->setText(settings.value("baseUrl").toString());
-    ui->txtViewSizeTrigger->setText(settings.value("viewSizeTrigger").toString());
-    ui->txtViewExternalViewer->setText(settings.value("viewExternalViewer").toString());
+    ui->txtLogDir->setText(settings.value(cfg_logDir).toString());
+    ui->txtLogFilespec->setText(settings.value(cfg_logFilespec).toString());
+    ui->txtGitDir->setText(settings.value(cfg_gitDir).toString());
+    ui->txtExtractionDir->setText(settings.value(cfg_extractionDir).toString());
+    ui->txtExtractScript->setText(settings.value(cfg_extractionScript).toString());
+    ui->txtBaseUrl->setText(settings.value(cfg_baseUrl).toString());
+    ui->txtViewSizeTrigger->setText(settings.value(cfg_viewSizeTrigger).toString());
+    ui->txtViewExternalViewer->setText(settings.value(cfg_viewExternalViewer).toString());
 }
 
 void dlgConfig::on_lblLogdir_linkActivated(const QString &link)
@@ -74,7 +74,7 @@ void dlgConfig::on_lblLogdir_linkActivated(const QString &link)
     {
         // Revert
         MYQSETTINGS(settings);
-        ui->txtLogDir->setText(settings.value("logDir").toString());
+        ui->txtLogDir->setText(settings.value(cfg_logDir).toString());
     }
 }
 
@@ -89,7 +89,7 @@ void dlgConfig::on_lblGitDir_linkActivated(const QString &link)
     {
         // Revert
         MYQSETTINGS(settings);
-        ui->txtGitDir->setText(settings.value("gitDir").toString());
+        ui->txtGitDir->setText(settings.value(cfg_gitDir).toString());
     }
 }
 
@@ -102,7 +102,7 @@ void dlgConfig::on_lblExtractDir_linkActivated(const QString &link)
     else // if (link == "reset")
     {
         MYQSETTINGS(settings);
-        ui->txtExtractionDir->setText(settings.value("extractionDir").toString());
+        ui->txtExtractionDir->setText(settings.value(cfg_extractionDir).toString());
     }
 }
 
@@ -115,7 +115,7 @@ void dlgConfig::on_lblExtractScript_linkActivated(const QString &link)
     else // if (link == "reset")
     {
         MYQSETTINGS(settings);
-        ui->txtExtractScript->setText(settings.value("extractScript").toString());
+        ui->txtExtractScript->setText(settings.value(cfg_extractionScript).toString());
     }
 }
 

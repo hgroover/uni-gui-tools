@@ -14,8 +14,8 @@ WebDownload::WebDownload(QWidget *parent) :
 {
     ui->setupUi(this);
     MYQSETTINGS(settings);
-    restoreGeometry(settings.value("dw_geometry").toByteArray());
-    restoreState(settings.value("dw_state").toByteArray());
+    restoreGeometry(settings.value(cfg_dw_geometry).toByteArray());
+    restoreState(settings.value(cfg_dw_state).toByteArray());
 }
 
 WebDownload::~WebDownload()
@@ -45,8 +45,8 @@ void WebDownload::on_btnDone_clicked()
         beginDownload(selected[n]->text().mid(2));
     }
     MYQSETTINGS(settings);
-    settings.setValue("dw_geometry", saveGeometry());
-    settings.setValue("dw_state", saveState());
+    settings.setValue(cfg_dw_geometry, saveGeometry());
+    settings.setValue(cfg_dw_state, saveState());
     hide();
     if (parent() != nullptr)
     {

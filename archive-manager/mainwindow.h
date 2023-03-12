@@ -41,6 +41,7 @@ protected slots:
     void populateViewBrowser(bool extracted);
     void on_DownloadCompleted(QString filename);
     void on_AssertFirstSelection();
+    void on_InitialLoad();
 
 private slots:
     // Where we save state/position. Ideally use installEventFilter() and get resize and change state events
