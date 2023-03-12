@@ -38,7 +38,8 @@ protected slots:
     void on_ViewExternalSizeTrigger(int fileSize);
     void on_ViewExternalViewer(QString viewerApp);
     void on_Refresh();
-    void populateViewBrowser(bool extracted);
+    void populateViewBrowser(bool extracted); ///< In mainwindow_viewbrowser.cpp
+    QString viewBrowserRow(QFileInfo &fi, int& recursionLevel, int maxRecursion, QString& prefix);
     void on_DownloadCompleted(QString filename);
     void on_AssertFirstSelection();
     void on_InitialLoad();

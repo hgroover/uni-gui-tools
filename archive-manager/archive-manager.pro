@@ -30,7 +30,8 @@ SOURCES += \
         mainwindow.cpp \
     dlgconfig.cpp \
     webdownload.cpp \
-    basicfileviewer.cpp
+    basicfileviewer.cpp \
+    mainwindow_viewbrowser.cpp
 
 HEADERS += \
         mainwindow.h \
