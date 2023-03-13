@@ -15,6 +15,15 @@ public:
     explicit BasicFileViewer(QWidget *parent = nullptr, QString logDir = QString(), QString extractedFile = QString());
     ~BasicFileViewer();
 
+    typedef enum {
+        FT_PLAINTEXT,
+        FT_HTML,
+        FT_JSON,
+        FT_BINARY,
+        FT_UNKNOWN
+    } FileType_t;
+
+    FileType_t detectedFileType() { return detected_; }
 private slots:
     void on_btnDone_clicked();
 
@@ -23,7 +32,7 @@ private:
     QString logDir_;
     QString extractedFile_;
     QString extractedFilePath_;
-
+    FileType_t detected_;
 };
 
 #endif // BASICFILEVIEWER_H

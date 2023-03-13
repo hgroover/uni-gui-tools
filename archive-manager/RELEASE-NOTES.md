@@ -4,6 +4,10 @@
 
 - fixed: external viewer parameters are not read on startup
 - verified: extract link works
+- added: expand directories one level down
+- added: logging to archive-manager.log
+- added: use monospace font for plain text, detect html and json
+
 
 ## Previous versions
 
