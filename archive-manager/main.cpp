@@ -7,10 +7,15 @@
 #include <QByteArray>
 #include <QString>
 #include <QMessageLogContext>
+#include <QDir>
+#include <QFile>
 
 #include <iostream>
+#include <stdio.h>
 
 static int g_verbose = 1;
+FILE *fLog = nullptr;
+QFile logFile;
 
 void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
@@ -32,17 +37,35 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
     case QtCriticalMsg:
         //fprintf(stderr, "Critical: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
         //break;
-        fprintf( stderr, "%s\n", localMsg.constData() );
+        fprintf( fLog, "%s\n", localMsg.constData() );
+        fflush( fLog );
         break;
     case QtFatalMsg:
-        //fprintf(stderr, "Fatal: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+        fprintf( fLog, "Fatal: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
         abort();
     }
 }
 
 int main(int argc, char *argv[])
 {
+    QDir appDir(QApplication::applicationDirPath());
+    QString prevLogPath(appDir.filePath("archive-manager-previous.log"));
+    QString curLogPath(appDir.filePath("archive-manager.log"));
+    QFile prevLog(prevLogPath);
+    if (prevLog.exists()) prevLog.remove();
+    logFile.setFileName(curLogPath);
+    if (logFile.exists())
+    {
+        logFile.rename(prevLogPath);
+    }
+    fLog = fopen( curLogPath.toLocal8Bit().constData(), "w" );
+    if (nullptr == fLog)
+    {
+        qWarning().noquote() << "Failed to open" << logFile.fileName();
+        fLog = stderr;
+    }
     qInstallMessageHandler(myMessageOutput);
+    qInfo().noquote() << "Starting" << QApplication::applicationName();
     QApplication a(argc, argv);
     MainWindow w;
     a.setApplicationDisplayName("Archive Manager");
