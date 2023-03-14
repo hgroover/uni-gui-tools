@@ -46,6 +46,8 @@ private:
     QNetworkAccessManager net_;
     QString fileFilter_;
     QString downloadDir_;
+    int prefixLen_;
+
 };
 
 #endif // WEBDOWNLOAD_H

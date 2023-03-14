@@ -10,12 +10,15 @@
 WebDownload::WebDownload(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::WebDownload),
-    net_()
+    net_(),
+    prefixLen_(6) // "[NEW] " or "[lcl] "
 {
     ui->setupUi(this);
     MYQSETTINGS(settings);
     restoreGeometry(settings.value(cfg_dw_geometry).toByteArray());
     restoreState(settings.value(cfg_dw_state).toByteArray());
+    ui->lstFiles->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    ui->lstFiles->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 }
 
 WebDownload::~WebDownload()
@@ -42,7 +45,7 @@ void WebDownload::on_btnDone_clicked()
     for (int n = 0; n < selected.count(); n++)
     {
         qInfo().noquote() << '[' << n << ']' << selected[n]->text();
-        beginDownload(selected[n]->text().mid(2));
+        beginDownload(selected[n]->text().mid(prefixLen_));
     }
     MYQSETTINGS(settings);
     settings.setValue(cfg_dw_geometry, saveGeometry());
@@ -101,8 +104,13 @@ void WebDownload::beginDownload(QString filename)
 void WebDownload::on_ReplyFinished(QNetworkReply *reply)
 {
     QString rawData = reply->readAll();
-    //qInfo().noquote() << rawData;
     QStringList a = rawData.split('\n', QString::SkipEmptyParts);
+    if (MainWindow::g_verbose > 0)
+    {
+        qDebug().noquote() << "Raw data -" << rawData.length() << "byte," << a.size() << "lines:";
+        qDebug().noquote() << rawData;
+        qDebug().noquote() << "-----------------";
+    }
     // Extract filenames from href="" tags
     QStringList aFiles;
     QRegExp reHref("href=\"([^\"]*)\"");
@@ -125,13 +133,27 @@ void WebDownload::on_ReplyFinished(QNetworkReply *reply)
                 {
                     // Use prefix L if cached locally, d if downloadable
                     aFiles.push_back(fnCandidate);
-                    QChar prefix('d');
+                    QString prefix("[NEW] ");
                     MainWindow *pMain = static_cast<MainWindow*>(parent());
                     if (pMain->hasLocalCopy(fnCandidate))
                     {
-                        prefix = 'L';
+                        prefix = "[lcl] ";
+                        if (MainWindow::g_verbose > 0)
+                        {
+                            qDebug().noquote() << "Local" << fnCandidate << "a[n]" << a[n];
+                        }
                     }
-                    ui->lstFiles->addItem(prefix + '-' + fnCandidate);
+                    else if (MainWindow::g_verbose > 0)
+                    {
+                        qDebug().noquote() << "Non-local" << fnCandidate << "a[n]" << a[n];
+                    }
+                    QString s(prefix + fnCandidate);
+                    if (MainWindow::g_verbose > 0)
+                    {
+                        qDebug().noquote() << "Adding to list:" << s;
+                    }
+                    // Turned of isWrapping which caused the second column
+                    ui->lstFiles->addItem(s);
                 }
                 else
                 {
@@ -139,6 +161,7 @@ void WebDownload::on_ReplyFinished(QNetworkReply *reply)
                     rejectCount++;
                 }
             }
+            fnCandidate.clear();
         }
     }
     ui->lblStatus->setText(QString().sprintf("Received %d bytes, %d lines, %d files (%d links rejected)",
