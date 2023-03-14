@@ -31,14 +31,18 @@ SOURCES += \
     dlgconfig.cpp \
     webdownload.cpp \
     basicfileviewer.cpp \
-    mainwindow_viewbrowser.cpp
+    mainwindow_viewbrowser.cpp \
+    sortablelistwidget.cpp \
+    sortablelistwidgetitem.cpp
 
 HEADERS += \
         mainwindow.h \
     dlgconfig.h \
     archive-manager-globals.h \
     webdownload.h \
-    basicfileviewer.h
+    basicfileviewer.h \
+    sortablelistwidget.h \
+    sortablelistwidgetitem.h
 
 FORMS += \
         mainwindow.ui \

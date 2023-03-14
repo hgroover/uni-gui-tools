@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QList>
+#include <QPair>
 
 #include "webdownload.h"
 
@@ -19,6 +21,9 @@ public:
 
     static QString tarballBasename(QString tarballFilename);
     static QString bashify(QString windowsPath);
+    void setLogVerboseLevel(int level) { g_verbose = level; }
+
+    static int g_verbose;
 
 signals:
     void updatedBaseUrl(QString baseUrl);
@@ -27,6 +32,7 @@ signals:
 
 public slots:
     bool hasLocalCopy(QString logFile);
+    void selectLogSort(QString keyId);
 
 protected slots:
     void on_LogDirChanged(QString logDir);
@@ -65,6 +71,14 @@ private slots:
 
     void on_btnDownload_clicked();
 
+    void on_lblGlobalOptions_linkActivated(const QString &link);
+
+    void on_lblGlobalOptions_linkHovered(const QString &link);
+
+    void on_lblSortOptions_linkActivated(const QString &link);
+
+    void on_lblSortOptions_linkHovered(const QString &link);
+
 private:
     Ui::MainWindow *ui;
     WebDownload web_;
@@ -85,6 +99,7 @@ private:
     bool bashValid_;
     bool extractScriptValid_;
     int logListDirty_;
+    static const QList<QList<QString>> a_sortLinks;
 
     // Current item row values set by on_lstLogs_currentRowChanged
     int curSelectedRow_;

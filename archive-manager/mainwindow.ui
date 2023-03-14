@@ -129,6 +129,13 @@
            </property>
           </widget>
          </item>
+         <item row="6" column="1">
+          <widget class="QLabel" name="lblGlobalOptions">
+           <property name="text">
+            <string>&lt;a href=&quot;toggleVerbose&quot;&gt;dbg&lt;/a&gt;</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
       </layout>
@@ -139,9 +146,20 @@
       <property name="title">
        <string>Logs</string>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout_3" stretch="4,2,0">
+      <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,4,2,0">
        <item>
-        <widget class="QListWidget" name="lstLogs"/>
+        <widget class="QLabel" name="lblSortOptions">
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sort options: [ date▼ ] | &lt;a href=&quot;dateAscending&quot;&gt;date▲&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="SortableListWidget" name="lstLogs">
+         <property name="sortingEnabled">
+          <bool>true</bool>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QTextBrowser" name="txtItemDetails">
@@ -285,6 +303,13 @@
   <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>SortableListWidget</class>
+   <extends>QListWidget</extends>
+   <header>sortablelistwidget.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

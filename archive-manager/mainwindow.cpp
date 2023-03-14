@@ -3,6 +3,7 @@
 #include "dlgconfig.h"
 #include "archive-manager-globals.h"
 #include "basicfileviewer.h"
+#include "sortablelistwidgetitem.h"
 
 #include <QDebug>
 #include <QProcess>
@@ -11,6 +12,12 @@
 #include <QDir>
 #include <QFile>
 #include <QStringList>
+
+int MainWindow::g_verbose = 1;
+const QList<QList<QString>> MainWindow::a_sortLinks = {
+    {"dateDescending", "date▼"},
+    {"dateAscending", "date▲"}
+};
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -184,11 +191,17 @@ void MainWindow::on_Refresh()
     qInfo().noquote() << "Refresh" << logDir_;
     QDir dirLogs(logDir_, logFilespec_, QDir::SortFlags(QDir::Name|QDir::IgnoreCase), QDir::Files);
     QStringList a = dirLogs.entryList();
-    qInfo().noquote() << "Found" << a.count() << "filespec:" << logFilespec_ << ":" << a;
+    qInfo().noquote() << "Found" << a.count() << "filespec:" << logFilespec_; // << ":" << a;
+    QFileInfoList ai = dirLogs.entryInfoList();
+    qInfo().noquote() << "Info list" << ai;
     ui->lstLogs->clear();
     for (int n = 0; n < a.count(); n++)
     {
-        ui->lstLogs->addItem(a[n]);
+        //ui->lstLogs->addItem(a[n]);
+        //qDebug().noquote() << '[' << n << ']' << ai[n].fileName() << a[n];
+        SortableListWidgetItem * sit = new SortableListWidgetItem(ai[n].fileName(), ui->lstLogs);
+        sit->setFileInfo(ai[n]);
+        ui->lstLogs->addItem(sit);
     }
     emit updatedLogFilespec(logFilespec_);
 }
@@ -407,9 +420,14 @@ void MainWindow::on_DownloadCompleted(QString filename)
 {
     qInfo().noquote() << "Download completed" << filename;
     // filename should exist in downloads
-    ui->lstLogs->insertItem(0, filename);
-    QTimer::singleShot(100, this, SLOT(on_AssertFirstSelection()));
-    qInfo() << "deferred reselect";
+    SortableListWidgetItem *sit = new SortableListWidgetItem(filename, ui->lstLogs);
+    QFileInfo fi;
+    fi.setFile(QDir(logDir_), filename);
+    sit->setFileInfo(fi);
+    ui->lstLogs->addItem(sit);
+    ui->lstLogs->setCurrentItem(sit);
+    //QTimer::singleShot(100, this, SLOT(on_AssertFirstSelection()));
+    //qInfo() << "deferred reselect";
 }
 
 // Used as a target for singleshot
@@ -423,4 +441,77 @@ bool MainWindow::hasLocalCopy(QString logFile)
 {
     QList<QListWidgetItem*> a = ui->lstLogs->findItems(logFile, Qt::MatchExactly);
     return a.size() > 0;
+}
+
+void MainWindow::on_lblGlobalOptions_linkActivated(const QString &link)
+{
+    if (link == "toggleVerbose")
+    {
+        g_verbose = (g_verbose + 1) % 2;
+        qInfo().noquote() << "Verbose" << g_verbose;
+    }
+    else if (link.length() > 0)
+    {
+        qWarning().noquote() << "Invalid link" << link;
+    }
+}
+
+void MainWindow::on_lblGlobalOptions_linkHovered(const QString &link)
+{
+    if (link.length() == 0) return;
+    QString msg("Unknown global option link ");
+    msg += link;
+    if (link == "toggleVerbose")
+    {
+        msg = QString().sprintf("Current verbose %d - click to change", g_verbose);
+    }
+    ui->statusBar->showMessage(msg, 10000);
+}
+
+void MainWindow::on_lblSortOptions_linkActivated(const QString &link)
+{
+    if (link.isEmpty()) return;
+    qDebug().noquote() << "sort:" << link;
+    selectLogSort(link);
+}
+
+void MainWindow::on_lblSortOptions_linkHovered(const QString &link)
+{
+    if (link.isEmpty()) return;
+    qDebug().noquote() << "hover:" << link;
+    QString msg("Unknown link ");
+    msg += link;
+    if (link == "dateAscending") msg = "Show logs sorted by download date from oldest to newest";
+    else if (link == "dateDescending") msg = "Show logs sorted by download date starting from most recent";
+    ui->statusBar->showMessage(msg, 15000);
+}
+
+void MainWindow::selectLogSort(QString sortOption)
+{
+    QString html("<html><head/><body><p>Sort options: ");
+    for (int n = 0; n < a_sortLinks.size(); n++)
+    {
+        bool selected = (sortOption == a_sortLinks[n][0]);
+        if (n > 0) html += " | ";
+        if (selected)
+        {
+            html += "[ ";
+            html += a_sortLinks[n][1];
+            html += " ] ";
+        }
+        else
+        {
+            html += " <a href=\"";
+            html += a_sortLinks[n][0];
+            html += "\">";
+            html += a_sortLinks[n][1];
+            html += "</a> ";
+        }
+    }
+    //"[ date▼ ] | <a href="dateAscending">date▲</a></p></body></html>")
+    html += "</html>";
+    qDebug().noquote() << "sort option" << sortOption << "result html" << html;
+    ui->lblSortOptions->setText(html);
+    SortableListWidgetItem::setSortOption(sortOption);
+    ui->lstLogs->sortItems();
 }
