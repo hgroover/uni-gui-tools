@@ -258,7 +258,7 @@ void MainWindow::on_btnLogExtract_clicked()
             break;
         case 0:
             qInfo().noquote() << "Success, cwd" << pExtract.workingDirectory();
-            //FIXME on_lstLogs_currentRowChanged(ui->lstLogs->currentRow());
+            on_lstLogsModel_clicked(logList_->findByFile(curLogFilename_));
             break;
         default:
             qInfo().noquote() << "Script failed - result of" << gitPath << ":" << res;
@@ -406,6 +406,8 @@ void MainWindow::on_DownloadCompleted(QString filename)
     logList_->addFileInfo(fi);
     //QTimer::singleShot(100, this, SLOT(on_AssertFirstSelection()));
     //qInfo() << "deferred reselect";
+    on_lstLogsModel_clicked(logList_->findByFile(filename));
+
 }
 
 // Used as a target for singleshot
