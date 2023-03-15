@@ -150,3 +150,12 @@ void LogListModel::on_sortOrder(QString sortOrder)
     qDebug().noquote() << "Sort order:" << sortOrder;
     rebuildGradeVector();
 }
+
+QString LogListModel::fileFromIndex(QModelIndex index) const
+{
+    if (!index.isValid() || index.row() >= aFileInfo_.size() || index.row() >= gradedIndices_.size())
+    {
+        return "";
+    }
+    return aFileInfo_[gradedIndices_[index.row()]].fileName();
+}

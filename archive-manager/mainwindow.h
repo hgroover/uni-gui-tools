@@ -6,6 +6,7 @@
 #include <QPair>
 
 #include "webdownload.h"
+#include "loglistmodel.h"
 
 namespace Ui {
 class MainWindow;
@@ -59,7 +60,7 @@ private slots:
 
     void on_btnRefresh_clicked();
 
-    void on_lstLogs_currentRowChanged(int currentRow);
+    //void on_lstLogs_currentRowChanged(int currentRow);
 
     void on_btnLogExtract_clicked();
 
@@ -78,6 +79,8 @@ private slots:
     void on_lblSortOptions_linkActivated(const QString &link);
 
     void on_lblSortOptions_linkHovered(const QString &link);
+
+    void on_lstLogsModel_clicked(const QModelIndex &index);
 
 private:
     Ui::MainWindow *ui;
@@ -106,6 +109,8 @@ private:
     QString curLogFilename_;
     QString curLogExtractDir_;
     QString curLogTarballPath_;
+
+    LogListModel *logList_;
 };
 
 #endif // MAINWINDOW_H

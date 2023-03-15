@@ -32,8 +32,7 @@ SOURCES += \
     webdownload.cpp \
     basicfileviewer.cpp \
     mainwindow_viewbrowser.cpp \
-    sortablelistwidget.cpp \
-    sortablelistwidgetitem.cpp
+    loglistmodel.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -41,8 +40,7 @@ HEADERS += \
     archive-manager-globals.h \
     webdownload.h \
     basicfileviewer.h \
-    sortablelistwidget.h \
-    sortablelistwidgetitem.h
+    loglistmodel.h
 
 FORMS += \
         mainwindow.ui \
@@ -60,4 +58,5 @@ DISTFILES += \
     DOCUMENTATION.md \
     TODO.md \
     RELEASE-NOTES.md \
-    PLUGINS.md
+    PLUGINS.md \
+    DEVELOPMENT.md

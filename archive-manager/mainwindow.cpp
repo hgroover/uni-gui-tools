@@ -214,39 +214,6 @@ void MainWindow::on_Refresh()
     emit updatedLogFilespec(logFilespec_);
 }
 
-/***
-void MainWindow::on_lstLogs_currentRowChanged(int currentRow)
-{
-    qDebug() << "New row" << currentRow << "extract" << extractionValid_ << "bash" << bashValid_;
-    curSelectedRow_ = currentRow;
-    if (currentRow < 0 || currentRow >= ui->lstLogs->count())
-    {
-        ui->btnLogExtract->setEnabled(false);
-        ui->btnView->setEnabled(false);
-        ui->btnClear->setEnabled(false);
-        curLogExtractDir_.clear();
-        curLogFilename_.clear();
-        curLogTarballPath_.clear();
-        ui->txtItemDetails->setText("<h2>No item selected</h2>");
-    }
-    else
-    {
-        curLogFilename_ = ui->lstLogs->currentItem()->text();
-        qInfo().noquote() << "Inserted" << curLogFilename_;
-        //QFileInfo fi(curLogFilename_);
-        QString baseName(tarballBasename(curLogFilename_));
-        QDir emptyDir(extractDir_ + '/' + baseName);
-        curLogTarballPath_ = logDir_ + '/' + curLogFilename_;
-        curLogExtractDir_ = emptyDir.path();
-        ui->btnLogExtract->setEnabled(extractionValid_ && bashValid_ && extractScriptValid_ && !emptyDir.exists());
-        ui->btnClear->setEnabled(emptyDir.exists());
-        ui->btnView->setEnabled(emptyDir.exists());
-        qInfo().noquote() << "Updating view browser";
-        populateViewBrowser(emptyDir.exists());
-    }
-}
-***/
-
 void MainWindow::on_btnLogExtract_clicked()
 {
     QDir parentDir(extractDir_);
@@ -537,6 +504,29 @@ void MainWindow::selectLogSort(QString sortOption)
 void MainWindow::on_lstLogsModel_clicked(const QModelIndex &index)
 {
     // Changed selection
-    QString file(logList_->fileFromIndex(index));
-    qDebug().noquote() << "New log model selection" << file;
+    if (!index.isValid())
+    {
+        ui->btnLogExtract->setEnabled(false);
+        ui->btnView->setEnabled(false);
+        ui->btnClear->setEnabled(false);
+        curLogExtractDir_.clear();
+        curLogFilename_.clear();
+        curLogTarballPath_.clear();
+        ui->txtItemDetails->setText("<h2>No item selected</h2>");
+    }
+    else
+    {
+        curLogFilename_ = logList_->fileFromIndex(index);
+        qDebug().noquote() << "New log model selection" << curLogFilename_;
+        //QFileInfo fi(curLogFilename_);
+        QString baseName(tarballBasename(curLogFilename_));
+        QDir emptyDir(extractDir_ + '/' + baseName);
+        curLogTarballPath_ = logDir_ + '/' + curLogFilename_;
+        curLogExtractDir_ = emptyDir.path();
+        ui->btnLogExtract->setEnabled(extractionValid_ && bashValid_ && extractScriptValid_ && !emptyDir.exists());
+        ui->btnClear->setEnabled(emptyDir.exists());
+        ui->btnView->setEnabled(emptyDir.exists());
+        qInfo().noquote() << "Updating view browser";
+        populateViewBrowser(emptyDir.exists());
+    }
 }
