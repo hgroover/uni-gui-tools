@@ -29,6 +29,7 @@ public:
     void addFileInfo(const QFileInfo &fi);
     QModelIndex findByFile(QString fileName) const;
     QString fileFromIndex(QModelIndex index) const;
+    QModelIndex lastAdded() const;
 
 public slots:
     void on_sortOrder(QString sortOrder);
@@ -45,6 +46,7 @@ protected:
     void setGradeEntry(int index);
     void rebuildGradeVector();
     void calculateGradeIndices();
+    int gradeIndexFromDataIndex(int dataIndex) const;
 
 };
 

@@ -12,7 +12,7 @@
 #include <QFile>
 #include <QStringList>
 
-int MainWindow::g_verbose = 1;
+int MainWindow::g_verbose = 0;
 const QList<QList<QString>> MainWindow::a_sortLinks = {
     {"dateDescending", "date▼", "Show logs sorted by download date starting from most recent"},
     {"dateAscending", "date▲", "Show logs sorted by download date from oldest to newest"},
@@ -44,6 +44,7 @@ MainWindow::MainWindow(QWidget *parent) :
     selectLogSort("dateDescending");
     emit updatedLogDir(logDir_);
     QTimer::singleShot(500, this, SLOT(on_Refresh()));
+    //QTimer::singleShot(2000, this, SLOT(testAnimator()));
 }
 
 MainWindow::~MainWindow()
@@ -258,7 +259,11 @@ void MainWindow::on_btnLogExtract_clicked()
             break;
         case 0:
             qInfo().noquote() << "Success, cwd" << pExtract.workingDirectory();
-            on_lstLogsModel_clicked(logList_->findByFile(curLogFilename_));
+            {
+                QModelIndex i = logList_->findByFile(curLogFilename_);
+                qInfo().noquote() << "index" << i << "for" << curLogFilename_;
+                on_lstLogsModel_clicked(i);
+            }
             break;
         default:
             qInfo().noquote() << "Script failed - result of" << gitPath << ":" << res;
@@ -406,8 +411,32 @@ void MainWindow::on_DownloadCompleted(QString filename)
     logList_->addFileInfo(fi);
     //QTimer::singleShot(100, this, SLOT(on_AssertFirstSelection()));
     //qInfo() << "deferred reselect";
-    on_lstLogsModel_clicked(logList_->findByFile(filename));
+    QTimer::singleShot(100, this, [this](){
+        QModelIndex last(logList_->lastAdded());
+        qDebug().noquote() << "lambda:" << last;
+        ui->lstLogsModel->selectionModel()->select(last, QItemSelectionModel::SelectCurrent);
+        on_lstLogsModel_clicked(last);
+    });
+}
 
+void MainWindow::testAnimator()
+{
+    static int counter = 0;
+    int rowSelection = counter % 12;
+    bool withClick = (counter >= 12);
+    QModelIndex test = logList_->index(rowSelection, 0);
+    ui->lstLogsModel->selectionModel()->select(test, QItemSelectionModel::SelectCurrent);
+    if (withClick) on_lstLogsModel_clicked(test);
+    counter++;
+    if (counter < 30)
+    {
+        qDebug() << "testAnimator finished" << counter;
+        QTimer::singleShot(5000, this, SLOT(testAnimator()));
+    }
+    else
+    {
+        qDebug() << "testAnimator finished";
+    }
 }
 
 // Used as a target for singleshot
@@ -429,6 +458,7 @@ void MainWindow::on_lblGlobalOptions_linkActivated(const QString &link)
     {
         g_verbose = (g_verbose + 1) % 2;
         qInfo().noquote() << "Verbose" << g_verbose;
+        ui->statusBar->showMessage(QString().sprintf("Debug level set to %d", g_verbose), 10000);
     }
     else if (link.length() > 0)
     {

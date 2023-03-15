@@ -50,6 +50,7 @@ protected slots:
     void on_DownloadCompleted(QString filename);
     void on_AssertFirstSelection();
     void on_InitialLoad();
+    void testAnimator();
 
 private slots:
     // Where we save state/position. Ideally use installEventFilter() and get resize and change state events

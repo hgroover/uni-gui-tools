@@ -1,15 +1,23 @@
 # Release notes and change log
 
-## 1.0.6 12-Mar-2023
+## 1.0.7
+
+This uses the view model list which provide flexible sort options.
+
+- added: sort links for log list, default to date
+- fixed: problem with two links on one line. This was actually wrapped items in the list widget
+- added: global options to toggle debug verbosity
+
+
+## Previous versions
+
+## 1.0.6 13-Mar-2023
 
 - fixed: external viewer parameters are not read on startup
 - verified: extract link works
 - added: expand directories one level down
 - added: logging to archive-manager.log
 - added: use monospace font for plain text, detect html and json
-
-
-## Previous versions
 
 ### 1.0.5 06-Mar-2023
 More incremental improvements

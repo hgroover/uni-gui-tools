@@ -103,9 +103,17 @@ QModelIndex LogListModel::findByFile(QString fileName) const
 {
     if (mapFileNameToIndex_.contains(fileName))
     {
-        return index(mapFileNameToIndex_[fileName], 0);
+        return index(gradeIndexFromDataIndex(mapFileNameToIndex_[fileName]), 0);
     }
     return QModelIndex();
+}
+
+QModelIndex LogListModel::lastAdded() const
+{
+    if (aFileInfo_.length()<1) return QModelIndex();
+    int reverseIndex = gradeIndexFromDataIndex(aFileInfo_.length()-1);
+    qDebug().noquote() << "last" << aFileInfo_.length()-1 << "graded" << reverseIndex;
+    return index(reverseIndex);
 }
 
 void LogListModel::setGradeEntry(int index)
@@ -139,6 +147,17 @@ void LogListModel::calculateGradeIndices()
         else
             gradedIndices_.push_back(i.value());
     }
+    qDebug() << gradedIndices_;
+}
+
+int LogListModel::gradeIndexFromDataIndex(int dataIndex) const
+{
+    for (int n = 0; n < aFileInfo_.size() && n < gradedIndices_.size(); n++)
+    {
+        if (gradedIndices_[n] == dataIndex) return n;
+    }
+    qWarning() << "Failed to find grade index for" << dataIndex << "gi" << gradedIndices_;
+    return 0;
 }
 
 void LogListModel::on_sortOrder(QString sortOrder)
