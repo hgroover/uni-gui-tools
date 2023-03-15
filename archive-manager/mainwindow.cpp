@@ -3,7 +3,6 @@
 #include "dlgconfig.h"
 #include "archive-manager-globals.h"
 #include "basicfileviewer.h"
-#include "sortablelistwidgetitem.h"
 
 #include <QDebug>
 #include <QProcess>
@@ -15,8 +14,10 @@
 
 int MainWindow::g_verbose = 1;
 const QList<QList<QString>> MainWindow::a_sortLinks = {
-    {"dateDescending", "date▼"},
-    {"dateAscending", "date▲"}
+    {"dateDescending", "date▼", "Show logs sorted by download date starting from most recent"},
+    {"dateAscending", "date▲", "Show logs sorted by download date from oldest to newest"},
+    {"nameDescending", "name▼", "Logs sorted by name in descending order"},
+    {"nameAscending", "name▲", "Logs sorted by name in ascending order"}
 };
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -29,6 +30,8 @@ MainWindow::MainWindow(QWidget *parent) :
     logListDirty_(1)
 {
     ui->setupUi(this);
+    logList_ = new LogListModel(ui->lstLogsModel);
+    ui->lstLogsModel->setModel(logList_);
     on_InitialLoad();
     MYQSETTINGS(settings);
     setWindowTitle(windowTitle() + " v" MY_APP_VER);
@@ -38,6 +41,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, SIGNAL(updatedLogFilespec(QString)), &web_, SLOT(on_UpdatedFilespec(QString)));
     connect(this, SIGNAL(updatedLogDir(QString)), &web_, SLOT(on_UpdatedLogDir(QString)));
     connect(&web_, SIGNAL(downloadCompleted(QString)), this, SLOT(on_DownloadCompleted(QString)));
+    selectLogSort("dateDescending");
     emit updatedLogDir(logDir_);
     QTimer::singleShot(500, this, SLOT(on_Refresh()));
 }
@@ -49,6 +53,8 @@ MainWindow::~MainWindow()
     disconnect(this, SIGNAL(updatedLogDir(QString)), &web_, SLOT(on_UpdatedLogDir(QString)));
     disconnect(&web_, SIGNAL(downloadCompleted(QString)), this, SLOT(on_DownloadCompleted(QString)));
     web_.close();
+    logList_->deleteLater();
+    logList_ = nullptr;
     delete ui;
 }
 
@@ -194,7 +200,8 @@ void MainWindow::on_Refresh()
     qInfo().noquote() << "Found" << a.count() << "filespec:" << logFilespec_; // << ":" << a;
     QFileInfoList ai = dirLogs.entryInfoList();
     qInfo().noquote() << "Info list" << ai;
-    ui->lstLogs->clear();
+    logList_->setFileInfoList(ai);
+    /**
     for (int n = 0; n < a.count(); n++)
     {
         //ui->lstLogs->addItem(a[n]);
@@ -203,9 +210,11 @@ void MainWindow::on_Refresh()
         sit->setFileInfo(ai[n]);
         ui->lstLogs->addItem(sit);
     }
+    **/
     emit updatedLogFilespec(logFilespec_);
 }
 
+/***
 void MainWindow::on_lstLogs_currentRowChanged(int currentRow)
 {
     qDebug() << "New row" << currentRow << "extract" << extractionValid_ << "bash" << bashValid_;
@@ -236,6 +245,7 @@ void MainWindow::on_lstLogs_currentRowChanged(int currentRow)
         populateViewBrowser(emptyDir.exists());
     }
 }
+***/
 
 void MainWindow::on_btnLogExtract_clicked()
 {
@@ -281,7 +291,7 @@ void MainWindow::on_btnLogExtract_clicked()
             break;
         case 0:
             qInfo().noquote() << "Success, cwd" << pExtract.workingDirectory();
-            on_lstLogs_currentRowChanged(ui->lstLogs->currentRow());
+            //FIXME on_lstLogs_currentRowChanged(ui->lstLogs->currentRow());
             break;
         default:
             qInfo().noquote() << "Script failed - result of" << gitPath << ":" << res;
@@ -348,7 +358,7 @@ void MainWindow::on_btnClear_clicked()
         if (exDir.removeRecursively())
         {
             qInfo().noquote() << "Success";
-            on_lstLogs_currentRowChanged(ui->lstLogs->currentRow());
+            //FIXME on_lstLogs_currentRowChanged(ui->lstLogs->currentRow());
         }
         else
         {
@@ -420,12 +430,13 @@ void MainWindow::on_DownloadCompleted(QString filename)
 {
     qInfo().noquote() << "Download completed" << filename;
     // filename should exist in downloads
-    SortableListWidgetItem *sit = new SortableListWidgetItem(filename, ui->lstLogs);
+    //SortableListWidgetItem *sit = new SortableListWidgetItem(filename, ui->lstLogs);
     QFileInfo fi;
     fi.setFile(QDir(logDir_), filename);
-    sit->setFileInfo(fi);
-    ui->lstLogs->addItem(sit);
-    ui->lstLogs->setCurrentItem(sit);
+    //sit->setFileInfo(fi);
+    //ui->lstLogs->addItem(sit);
+    //ui->lstLogs->setCurrentItem(sit);
+    logList_->addFileInfo(fi);
     //QTimer::singleShot(100, this, SLOT(on_AssertFirstSelection()));
     //qInfo() << "deferred reselect";
 }
@@ -434,13 +445,13 @@ void MainWindow::on_DownloadCompleted(QString filename)
 void MainWindow::on_AssertFirstSelection()
 {
     qInfo().noquote() << "Asserting selection of row 0";
-    ui->lstLogs->setCurrentRow(0); // This will fire the event handler
+    //ui->lstLogs->setCurrentRow(0); // This will fire the event handler
 }
 
 bool MainWindow::hasLocalCopy(QString logFile)
 {
-    QList<QListWidgetItem*> a = ui->lstLogs->findItems(logFile, Qt::MatchExactly);
-    return a.size() > 0;
+    QModelIndex i = logList_->findByFile(logFile);
+    return i.isValid();
 }
 
 void MainWindow::on_lblGlobalOptions_linkActivated(const QString &link)
@@ -472,6 +483,7 @@ void MainWindow::on_lblSortOptions_linkActivated(const QString &link)
 {
     if (link.isEmpty()) return;
     qDebug().noquote() << "sort:" << link;
+    logList_->on_sortOrder(link);
     selectLogSort(link);
 }
 
@@ -481,8 +493,14 @@ void MainWindow::on_lblSortOptions_linkHovered(const QString &link)
     qDebug().noquote() << "hover:" << link;
     QString msg("Unknown link ");
     msg += link;
-    if (link == "dateAscending") msg = "Show logs sorted by download date from oldest to newest";
-    else if (link == "dateDescending") msg = "Show logs sorted by download date starting from most recent";
+    for (int n = 0; n < a_sortLinks.size(); n++)
+    {
+        if (link == a_sortLinks[n][0])
+        {
+            msg = a_sortLinks[n][2];
+            break;
+        }
+    }
     ui->statusBar->showMessage(msg, 15000);
 }
 
@@ -512,6 +530,13 @@ void MainWindow::selectLogSort(QString sortOption)
     html += "</html>";
     qDebug().noquote() << "sort option" << sortOption << "result html" << html;
     ui->lblSortOptions->setText(html);
-    SortableListWidgetItem::setSortOption(sortOption);
-    ui->lstLogs->sortItems();
+    //SortableListWidgetItem::setSortOption(sortOption);
+    //ui->lstLogs->sortItems();
+}
+
+void MainWindow::on_lstLogsModel_clicked(const QModelIndex &index)
+{
+    // Changed selection
+    QString file(logList_->fileFromIndex(index));
+    qDebug().noquote() << "New log model selection" << file;
 }
