@@ -32,7 +32,8 @@ SOURCES += \
     webdownload.cpp \
     basicfileviewer.cpp \
     mainwindow_viewbrowser.cpp \
-    loglistmodel.cpp
+    loglistmodel.cpp \
+    mainwindow_extract.cpp
 
 HEADERS += \
         mainwindow.h \

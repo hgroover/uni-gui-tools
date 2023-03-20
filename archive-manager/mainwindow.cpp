@@ -228,27 +228,32 @@ void MainWindow::on_btnLogExtract_clicked()
         QApplication::processEvents();
         QApplication::processEvents();
         qInfo().noquote() << "Extracting" << curLogFilename_ << "to" << curLogExtractDir_;
-        QProcess pExtract(this);
+        QProcess * pExtract = prepareRunner();
         // You would think this would work, but the script will still run in the app dir unless we explicitly change
         // the app's working directory.
-        pExtract.setWorkingDirectory(curLogExtractDir_);
+        pExtract->setWorkingDirectory(curLogExtractDir_);
         QString appCurrentDir(QDir::currentPath());
         QDir::setCurrent(curLogExtractDir_);
-        QString gitPath("\"");
-        gitPath += gitShellPath_;
-        gitPath += "\" -c \"";
-        gitPath += bashify(extractScript_);
-        gitPath += ' ';
-        gitPath += bashify(curLogTarballPath_);
-        gitPath += '\"';
-        QApplication::processEvents();
-        QApplication::processEvents();
-        QApplication::processEvents();
-        int res = pExtract.execute(gitPath);
-        QApplication::processEvents();
-        QApplication::processEvents();
-        QApplication::processEvents();
+        QString gitPath;
+#if defined(Q_OS_WIN)
+            gitPath = "\"";
+            gitPath += gitShellPath_;
+            gitPath += "\" -c \"";
+            gitPath += bashify(extractScript_);
+            gitPath += ' ';
+            gitPath += bashify(curLogTarballPath_);
+            gitPath += '"';
+#else
+        // Linux / MAC_OS
+            gitPath = extractScript_;
+            gitPath += " \"";
+            gitPath += curLogTarballPath_;
+            gitPath += '"';
+#endif
+        pExtract->start(gitPath);
         // execute() returns -1 if crash, -2 if cannot start, else ok
+        // start will only return on signal
+        /****
         switch (res)
         {
         case -1:
@@ -260,18 +265,14 @@ void MainWindow::on_btnLogExtract_clicked()
             ui->txtItemDetails->setText("Failed to run extraction script");
             break;
         case 0:
-            qInfo().noquote() << "Success, cwd" << pExtract.workingDirectory();
-            {
-                QModelIndex i = logList_->findByFile(curLogFilename_);
-                qInfo().noquote() << "index" << i << "for" << curLogFilename_;
-                on_lstLogsModel_clicked(i);
-            }
+            qInfo().noquote() << "Started, cwd" << pExtract->workingDirectory();
             break;
         default:
             qInfo().noquote() << "Script failed - result of" << gitPath << ":" << res;
             ui->txtItemDetails->setText("Failed to extract. current git path:" + gitPath);
             break;
         }
+        ***/
         QDir::setCurrent(appCurrentDir);
     }
     else

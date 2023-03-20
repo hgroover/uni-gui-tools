@@ -52,6 +52,11 @@ protected slots:
     void on_InitialLoad();
     void testAnimator();
 
+    // in mainwindow_extract.cpp
+    void on_ExtractionFinished(int exitCode, QProcess::ExitStatus exitStatus);
+    void on_ExtractionReadyRead();
+    void on_ExtractionError(QProcess::ProcessError error);
+
 private slots:
     // Where we save state/position. Ideally use installEventFilter() and get resize and change state events
     // so we can handle user closing window via X in title bar
@@ -82,6 +87,10 @@ private slots:
     void on_lblSortOptions_linkHovered(const QString &link);
 
     void on_lstLogsModel_clicked(const QModelIndex &index);
+
+protected:
+    // In mainwindow_extract.cpp
+    QProcess *prepareRunner();
 
 private:
     Ui::MainWindow *ui;

@@ -12,6 +12,12 @@ environment variables.
 Plugins reside in a specified directory and use the extension .am-plugin. They should have
 the executable bit set (already the default when saving files in windows for git bash).
 
+Plugins are specific to a context:
+  gui - general gui form which allows entry of fields which are passed to the plugin script
+  download - optional navigation links for the download dialog allow browsing to separate
+        pages.
+  post - post-processing script to run in an extracted directory
+
 Here's a simple example plugin which might be saved as ~/plugins/hello.am-plugin
 
 ```
@@ -23,6 +29,7 @@ Here's a simple example plugin which might be saved as ~/plugins/hello.am-plugin
 {
   "PluginSpec": 1.0,
   "Visible": true,
+  "Context": "gui",
   "Form": {
     "Title": "Hello example",
     "Fields": [
