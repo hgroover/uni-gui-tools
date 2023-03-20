@@ -11,6 +11,7 @@
 #include <QDir>
 #include <QFile>
 #include <QStringList>
+#include <QFileInfo>
 
 int MainWindow::g_verbose = 0;
 const QList<QList<QString>> MainWindow::a_sortLinks = {
@@ -200,7 +201,8 @@ void MainWindow::on_Refresh()
     QStringList a = dirLogs.entryList();
     qInfo().noquote() << "Found" << a.count() << "filespec:" << logFilespec_; // << ":" << a;
     QFileInfoList ai = dirLogs.entryInfoList();
-    qInfo().noquote() << "Info list" << ai;
+    // Does not work with Qt before 5.15
+    //qInfo().noquote() << "Info list" << ai;
     logList_->setFileInfoList(ai);
     /**
     for (int n = 0; n < a.count(); n++)
@@ -315,7 +317,8 @@ void MainWindow::on_btnView_clicked()
     QFileInfoList a(logDir.entryInfoList());
     for (int n = 0; n < a.length(); n++)
     {
-        qInfo().noquote() << '[' << n << ']' << a[n];
+        // Qt does not support QFileInfo output before 5.15
+        qInfo().noquote() << '[' << n << ']' << a[n].absoluteFilePath();
     }
 }
 
