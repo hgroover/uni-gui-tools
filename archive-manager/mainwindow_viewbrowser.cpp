@@ -11,6 +11,8 @@ void MainWindow::populateViewBrowser(bool extracted)
     {
         // If there's an insight script, run it otherwise default action is here
         html = "<h5>" + curLogExtractDir_ + "</h5>";
+        // Experiment - this doesn't work, as expected (no webkit here, just basic rich text)
+        //html += "<p>Test: <form id=\"test1\" method=\"get\"><input type=\"text\" id=\"foo\" name=\"foobar\"/><input type=\"submit\" value=\"done\"/></form></p>\n";
         html += "<table padding=\"1\"><thead><tr><th align=\"left\">File</th><th>Size</th><th align=\"left\">Details</th><</tr></thead>\n";
         html += "<tbody>\n";
         QString prefix;
