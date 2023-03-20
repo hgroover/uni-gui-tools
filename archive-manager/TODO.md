@@ -6,3 +6,9 @@ As items get completed they move from here to RELEASE-NOTES.md
 - FEATURE: add plugins
 - FEATURE: capture extract script output to log
 - BUG: scroll log into view when downloading and not reverse order by date
+- BUG: on 4k monitor, log list shows only 4 lines - too small in relation to contents. Need ability to adjust sizes
+- BUG: clear does not refresh view
+- BUG: refresh on download dialog does not work
+- FEATURE: detach download and viewer dialogs
+- FEATURE: run extract script asynchronously and capture output to log
+
