@@ -7,6 +7,7 @@
 
 #include "webdownload.h"
 #include "loglistmodel.h"
+#include "plugin.h"
 
 namespace Ui {
 class MainWindow;
@@ -24,6 +25,12 @@ public:
     static QString bashify(QString windowsPath);
     void setLogVerboseLevel(int level) { g_verbose = level; }
 
+    // Provide a variant shell command line that will work on Windows+gitbash or Linux or OSX
+    QString shellCmdLine(QString shellPath, QStringList shellArgs = QStringList());
+
+    // Get list of plugins for specific context
+    QList<Plugin*> getPluginsForContext(QString context);
+
     static int g_verbose;
 
 signals:
@@ -34,6 +41,8 @@ signals:
 public slots:
     bool hasLocalCopy(QString logFile);
     void selectLogSort(QString keyId);
+    void addPlugin(Plugin *p);
+    void removePlugin(Plugin *p);
 
 protected slots:
     void on_LogDirChanged(QString logDir);
@@ -92,6 +101,8 @@ protected:
     // In mainwindow_extract.cpp
     QProcess *prepareRunner();
 
+    int loadPlugins();
+
 private:
     Ui::MainWindow *ui;
     WebDownload web_;
@@ -121,6 +132,8 @@ private:
     QString curLogTarballPath_;
 
     LogListModel *logList_;
+    QMap<QString,Plugin*> plugins_;
+
 };
 
 #endif // MAINWINDOW_H

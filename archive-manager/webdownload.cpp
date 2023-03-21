@@ -8,11 +8,12 @@
 #include <QRegExp>
 
 WebDownload::WebDownload(QWidget *parent) :
-    QMainWindow(parent),
+    QMainWindow(nullptr),
     ui(new Ui::WebDownload),
     net_(),
     prefixLen_(6) // "[NEW] " or "[lcl] "
 {
+    main_ = qobject_cast<MainWindow*>(parent);
     ui->setupUi(this);
     MYQSETTINGS(settings);
     restoreGeometry(settings.value(cfg_dw_geometry).toByteArray());
@@ -51,10 +52,10 @@ void WebDownload::on_btnDone_clicked()
     settings.setValue(cfg_dw_geometry, saveGeometry());
     settings.setValue(cfg_dw_state, saveState());
     hide();
-    if (parent() != nullptr)
+    if (main_ != nullptr)
     {
         qInfo().noquote() << "Returning focus to main window";
-        ((QWidget*)parent())->setFocus();
+        main_->setFocus();
     }
 }
 
@@ -81,6 +82,25 @@ void WebDownload::rebuildList(QString baseUrl)
       on_ReplyFinished(reply);
     });
 
+    // Get links
+    QList<Plugin*> pluginList = main_->getPluginsForContext("download");
+    qInfo().noquote() << "Download plugin count" << pluginList.size();
+    QString htmlContent;
+    for (int n = 0; n < pluginList.size(); n++)
+    {
+        bool ok;
+        QByteArray html = pluginList[n]->runScript(QStringList(), ok);
+        if (ok)
+        {
+            htmlContent += html;
+            qInfo().noquote() << "Got" << html.length() << "bytes";
+        }
+        else
+        {
+            qWarning().noquote() << "Failed" << pluginList[n]->id();
+        }
+    }
+    ui->lblLinks->setText(htmlContent);
 }
 
 void WebDownload::beginDownload(QString filename)
@@ -134,8 +154,7 @@ void WebDownload::on_ReplyFinished(QNetworkReply *reply)
                     // Use prefix L if cached locally, d if downloadable
                     aFiles.push_back(fnCandidate);
                     QString prefix("[NEW] ");
-                    MainWindow *pMain = static_cast<MainWindow*>(parent());
-                    if (pMain->hasLocalCopy(fnCandidate))
+                    if (main_->hasLocalCopy(fnCandidate))
                     {
                         prefix = "[lcl] ";
                         if (MainWindow::g_verbose > 0)
@@ -199,4 +218,10 @@ void WebDownload::on_DownloadFinished(QNetworkReply *reply, QString savePath)
 void WebDownload::on_UpdatedFilespec(QString filespec)
 {
     fileFilter_ = filespec;
+}
+
+void WebDownload::on_lblLinks_linkActivated(const QString &link)
+{
+    qInfo().noquote() << "Navigating to" << link;
+    on_UpdatedBaseUrl(link);
 }

@@ -9,14 +9,17 @@ and responds by returning JSON defining the GUI elements needed to operate.
 GUI elements are used to define elements that get passed to the script as arguments or
 environment variables.
 
-Plugins reside in a specified directory and use the extension .am-plugin. They should have
-the executable bit set (already the default when saving files in windows for git bash).
+Plugins reside in the am-plugins directory (relative to the executable) and use the
+extension .am-plugin. They should have the executable bit set (already the default
+when saving files in windows for git bash).
 
 Plugins are specific to a context:
   gui - general gui form which allows entry of fields which are passed to the plugin script
   download - optional navigation links for the download dialog allow browsing to separate
         pages.
   post - post-processing script to run in an extracted directory
+
+The only required attributes are ID and Context.
 
 Here's a simple example plugin which might be saved as ~/plugins/hello.am-plugin
 
@@ -28,6 +31,7 @@ Here's a simple example plugin which might be saved as ~/plugins/hello.am-plugin
   cat <<__GETDEFS__
 {
   "PluginSpec": 1.0,
+  "ID": "HelloWorld",
   "Visible": true,
   "Context": "gui",
   "Form": {

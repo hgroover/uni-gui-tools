@@ -33,7 +33,8 @@ SOURCES += \
     basicfileviewer.cpp \
     mainwindow_viewbrowser.cpp \
     loglistmodel.cpp \
-    mainwindow_extract.cpp
+    mainwindow_extract.cpp \
+    plugin.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -41,7 +42,8 @@ HEADERS += \
     archive-manager-globals.h \
     webdownload.h \
     basicfileviewer.h \
-    loglistmodel.h
+    loglistmodel.h \
+    plugin.h
 
 FORMS += \
         mainwindow.ui \

@@ -46,6 +46,7 @@ MainWindow::MainWindow(QWidget *parent) :
     emit updatedLogDir(logDir_);
     QTimer::singleShot(500, this, SLOT(on_Refresh()));
     //QTimer::singleShot(2000, this, SLOT(testAnimator()));
+    loadPlugins();
 }
 
 MainWindow::~MainWindow()
@@ -57,6 +58,10 @@ MainWindow::~MainWindow()
     web_.close();
     logList_->deleteLater();
     logList_ = nullptr;
+    for (QMap<QString,Plugin*>::iterator i = plugins_.begin(); i != plugins_.end(); i++)
+    {
+        i.value()->deleteLater();
+    }
     delete ui;
 }
 
@@ -217,6 +222,33 @@ void MainWindow::on_Refresh()
     emit updatedLogFilespec(logFilespec_);
 }
 
+QString MainWindow::shellCmdLine(QString shellPath, QStringList shellArgs)
+{
+    QString cmdLine;
+#if defined(Q_OS_WIN)
+    cmdLine = "\"";
+    cmdLine += gitShellPath_;
+    cmdLine += "\" -c \"";
+    cmdLine += bashify(shellPath);
+    for (int n = 0; n < shellArgs.size(); n++)
+    {
+        cmdLine += ' ';
+        cmdLine += bashify(shellArgs[n]);
+    }
+    cmdLine += '"';
+#else
+        // Linux / MAC_OS
+    cmdLine = shellPath;
+    for (int n = 0; n < shellArgs.size(); n++)
+    {
+        cmdLine += " \"";
+        cmdLine += shellArgs[n];
+        cmdLine += '"';
+    }
+#endif
+    return cmdLine;
+}
+
 void MainWindow::on_btnLogExtract_clicked()
 {
     QDir parentDir(extractDir_);
@@ -234,22 +266,7 @@ void MainWindow::on_btnLogExtract_clicked()
         pExtract->setWorkingDirectory(curLogExtractDir_);
         QString appCurrentDir(QDir::currentPath());
         QDir::setCurrent(curLogExtractDir_);
-        QString gitPath;
-#if defined(Q_OS_WIN)
-            gitPath = "\"";
-            gitPath += gitShellPath_;
-            gitPath += "\" -c \"";
-            gitPath += bashify(extractScript_);
-            gitPath += ' ';
-            gitPath += bashify(curLogTarballPath_);
-            gitPath += '"';
-#else
-        // Linux / MAC_OS
-            gitPath = extractScript_;
-            gitPath += " \"";
-            gitPath += curLogTarballPath_;
-            gitPath += '"';
-#endif
+        QString gitPath(shellCmdLine(extractScript_, QStringList() << curLogTarballPath_));
         pExtract->start(gitPath);
         // execute() returns -1 if crash, -2 if cannot start, else ok
         // start will only return on signal
@@ -565,4 +582,71 @@ void MainWindow::on_lstLogsModel_clicked(const QModelIndex &index)
         qInfo().noquote() << "Updating view browser";
         populateViewBrowser(emptyDir.exists());
     }
+}
+
+void MainWindow::addPlugin(Plugin *p)
+{
+    if (!p->isValid()) return;
+    QString id(p->id());
+    if (plugins_.contains(id))
+    {
+        qWarning().noquote() << "Replacing" << id;
+        if (plugins_[id] != p) plugins_[id]->deleteLater();
+    }
+    else
+    {
+        qInfo().noquote() << "Adding plugin" << id << "with context" << p->context();
+    }
+    plugins_[id] = p;
+}
+
+void MainWindow::removePlugin(Plugin *p)
+{
+    QString id(p->id());
+    if (plugins_.contains(id))
+    {
+        qInfo().noquote() << "Removing" << id;
+        plugins_.remove(id);
+    }
+    else
+    {
+        qWarning().noquote() << "Not in map:" << id;
+    }
+    p->deleteLater();
+}
+
+int MainWindow::loadPlugins()
+{
+    QDir pluginDir(QDir(QApplication::applicationDirPath()).absoluteFilePath("am-plugins"));
+    QFileInfoList pluginList(pluginDir.entryInfoList(QStringList() << "*.am-plugin", QDir::Files));
+    int totalAdded = 0;
+    qDebug().noquote() << "Reading from" << pluginDir.absolutePath();
+    qDebug().noquote() << "Info list size:" << pluginList.size();
+    for (int n = 0; n < pluginList.size(); n++)
+    {
+        if (!pluginList[n].isFile()) continue;
+        Plugin *p = new Plugin(this);
+        //qDebug().noquote() << "Plugin:" << pluginList[n].filePath();
+        p->init(pluginList[n].filePath());
+        if (p->isValid())
+        {
+            totalAdded++;
+        }
+    }
+    qInfo() << totalAdded << "plugins added";
+    return totalAdded;
+}
+
+QList<Plugin*> MainWindow::getPluginsForContext(QString context)
+{
+    QMap<QString,Plugin*>::iterator i;
+    QList<Plugin*> r;
+    for (i = plugins_.begin(); i != plugins_.end(); i++)
+    {
+        if (i.value()->context() == context)
+        {
+            r << i.value();
+        }
+    }
+    return r;
 }

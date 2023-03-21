@@ -8,6 +8,8 @@
 #include <QNetworkRequest>
 #include <QNetworkReply>
 
+class MainWindow;
+
 namespace Ui {
 class WebDownload;
 }
@@ -41,12 +43,15 @@ private slots:
 
     void on_btnDone_clicked();
 
+    void on_lblLinks_linkActivated(const QString &link);
+
 private:
     Ui::WebDownload *ui;
     QNetworkAccessManager net_;
     QString fileFilter_;
     QString downloadDir_;
     int prefixLen_;
+    MainWindow *main_;
 
 };
 
