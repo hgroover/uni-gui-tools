@@ -146,7 +146,7 @@
       <property name="title">
        <string>Logs</string>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,2,0">
+      <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0,0">
        <item>
         <widget class="QLabel" name="lblSortOptions">
          <property name="text">
