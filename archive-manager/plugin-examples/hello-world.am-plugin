@@ -1,0 +1,58 @@
+#!/bin/sh
+# Example archive-manager plugin
+
+[ "$1" = "__getdefs" ] && {
+  cat <<__GETDEFS__
+{
+  "PluginSpec": 1.0,
+  "ID": "HelloWorld",
+  "Visible": true,
+  "Context": "gui",
+  "Form": {
+    "Title": "Hello example",
+    "Fields": [
+      {
+        "ID": "Name",
+        "PassAs": "arg",
+        "Index": 1,
+        "Label": "Your name:",
+        "Type": "text",
+        "Persist": false,
+        "Required": true
+      },
+      {
+        "ID": "Dow",
+        "PassAs": "arg",
+        "Index": 2,
+        "Label": "Day of week:",
+        "Type": "dropdown",
+        "Persist": false,
+        "Required": true,
+        "Elements": [
+          { "Label": "Sunday", "Value": "Sun" },
+          { "Label": "Mon" },
+          { "Label": "Tue" },
+          { "Label": "Wed" },
+          { "Label": "Thu" },
+          { "Label": "Fri" },
+          { "Label": "Sat" }
+        ]
+      },
+      {
+        "ID": "Weather",
+        "PassAs": "env",
+        "EnvName": "WEATHER",
+        "Label": "Weather condition:",
+        "Type": "text",
+        "Persist": false,
+        "Required": false,
+        "Default": "sunny"
+    ]
+  }
+}
+__GETDEFS__
+  exit 0
+}
+
+echo "Hello $1 it's $2 and the weather is ${WEATHER}"
+
