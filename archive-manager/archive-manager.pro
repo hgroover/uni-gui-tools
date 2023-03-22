@@ -62,4 +62,5 @@ DISTFILES += \
     TODO.md \
     RELEASE-NOTES.md \
     PLUGINS.md \
-    DEVELOPMENT.md
+    DEVELOPMENT.md \
+    plugin-examples/hello-world.am-plugin
