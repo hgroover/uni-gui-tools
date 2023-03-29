@@ -29,7 +29,7 @@
         "Persist": false,
         "Required": true,
         "Elements": [
-          { "Label": "Sunday", "Value": "Sun" },
+          { "Label": "Sun", "Value": "Sunday" },
           { "Value": "Mon" },
           { "Value": "Tue" },
           { "Value": "Wed" },

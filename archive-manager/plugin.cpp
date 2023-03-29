@@ -91,7 +91,7 @@ bool Plugin::runScript(const QList<QString> &args, const QMap<QString, QString> 
 {
     MainWindow *m = qobject_cast<MainWindow*>(parent());
     QString cmd(m->shellCmdLine(scriptPath_, args));
-    QProcess runner(this);
+    QProcess * runner = new QProcess(this);
     QProcessEnvironment processEnv;
     if (!env.isEmpty())
     {
@@ -101,24 +101,54 @@ bool Plugin::runScript(const QList<QString> &args, const QMap<QString, QString> 
         {
             processEnv.insert(i.key(), i.value());
         }
-        runner.setProcessEnvironment(processEnv);
+        qDebug().noquote() << "Set process environment" << env;
+        runner->setProcessEnvironment(processEnv);
     }
-    runner.start(cmd);
-    if (!runner.waitForStarted(500))
+    else
+    {
+        qDebug().noquote() << "No environment";
+    }
+    connect( runner, SIGNAL(errorOccurred(QProcess::ProcessError)), this, SLOT(on_errorOccurred(QProcess::ProcessError)));
+    connect( runner, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(on_finished(int,QProcess::ExitStatus)));
+    connect( runner, SIGNAL(readyRead()), this, SLOT(on_readyRead()));
+    qDebug().noquote() << "Starting" << cmd;
+    runner->start(cmd);
+    if (!runner->waitForStarted(500))
     {
         qCritical().noquote() << "Failed to start" << cmd;
+        QTimer::singleShot(1000, runner, SLOT(deleteLater()));
         return false;
     }
-    if (!runner.waitForFinished(1000))
-    {
-        qCritical().noquote() << "Failed to finish" << cmd;
-        return false;
-    }
-    QList<QByteArray> b = runner.readAll().split('\n');
+    return true;
+}
+
+void Plugin::on_finished(int exitCode, QProcess::ExitStatus exitStatus)
+{
+    emit outputLine(QString().sprintf("Exit code %d", exitCode));
+    QProcess *r = qobject_cast<QProcess*>(sender());
+    //_getOutput(r);
+    QTimer::singleShot(1000, r, SLOT(deleteLater()));
+}
+
+void Plugin::on_errorOccurred(QProcess::ProcessError error)
+{
+    emit outputLine("Error: " + error);
+    QProcess *r =  qobject_cast<QProcess*>(sender());
+    QTimer::singleShot(1000, r, SLOT(deleteLater()));
+}
+
+void Plugin::on_readyRead()
+{
+    QProcess *r = qobject_cast<QProcess*>(sender());
+    _getOutput(r);
+}
+
+void Plugin::_getOutput(QProcess *r)
+{
+    QList<QByteArray> b = r->readAll().split('\n');
     for (int n = 0; n < b.count(); n++)
     {
         if (b[n].isEmpty()) continue;
         emit outputLine(b[n]);
     }
-    return true;
 }

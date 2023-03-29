@@ -114,7 +114,7 @@ QString PluginField::_getText()
     }
     if (type_ == "dropdown")
     {
-        return qobject_cast<QComboBox*>(widget_)->currentText();
+        return qobject_cast<QComboBox*>(widget_)->currentData().toString();
     }
     return QString();
 }

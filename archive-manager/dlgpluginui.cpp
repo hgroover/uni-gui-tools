@@ -111,7 +111,7 @@ void DlgPluginUI::on_btnExecute_clicked()
         argList.removeFirst();
         if (plugin_->runScript(argList, envMap))
         {
-            emit logging("Execution successful");
+            emit logging("Execution successfully started");
         }
         else
         {
