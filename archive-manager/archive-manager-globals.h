@@ -3,7 +3,7 @@
 
 #define MYQSETTINGS(instanceName) QSettings instanceName("archive-manager.ini", QSettings::IniFormat)
 
-#define MY_APP_VER "1.0.7a"
+#define MY_APP_VER "1.0.9"
 
 static const char *cfg_cw_geometry = "cw_geometry";
 static const char *cfg_cw_state = "cw_state";
@@ -22,5 +22,7 @@ static const char *cfg_mw_state = "mw_state";
 static const char *cfg_dw_geometry = "dw_geometry";
 static const char *cfg_dw_state = "dw_state";
 
+static const char *cfg_pw_geometry = "pw_geometry";
+static const char *cfg_pw_state = "pw_state";
 
 #endif // ARCHIVEMANAGERGLOBALS_H
