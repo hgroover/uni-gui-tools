@@ -13,6 +13,8 @@ DlgPluginUI::DlgPluginUI(Plugin *p, QWidget *parent) :
 {
     main_ = qobject_cast<MainWindow*>(parent);
     plugin_ = p;
+    // Set up relay
+    connect( plugin_, SIGNAL(outputLine(QString)), SIGNAL(logging(QString)));
     ui->setupUi(this);
     // Continue after creator has hooked up signals
     QTimer::singleShot(100, this, SLOT(delayedInit()));
@@ -47,12 +49,18 @@ void DlgPluginUI::delayedInit()
                 if (field["Type"] == "text")
                 {
                     QLineEdit *txt = new QLineEdit(ui->formLayout->widget());
+                    PluginField f(field, txt, plugin_, this);
+                    f.setupWidget();
                     ui->formLayout->addRow(field["Label"].toString(), txt);
+                    fields_.push_back(f);
                 }
                 else if (field["Type"] == "dropdown")
                 {
                     QComboBox *combo = new QComboBox(ui->formLayout->widget());
+                    PluginField f(field, combo, plugin_, this);
+                    f.setupWidget();
                     ui->formLayout->addRow(field["Label"].toString(), combo);
+                    fields_.push_back(f);
                 }
                 else emit logging("Unknown type " + field["Type"].toString());
             }
@@ -81,5 +89,33 @@ void DlgPluginUI::on_btnDone_clicked()
 
 void DlgPluginUI::on_btnExecute_clicked()
 {
-    emit logging("--- begin execution ---");
+    emit logging(QString().sprintf("--- begin execution (%d fields) ---", fields_.count() ));
+    QList<QString> argList;
+    QMap<QString,QString> envMap;
+    int failureCount = 0;
+    argList << plugin_->getScriptPath();
+    for (int n = 0; n < fields_.count(); n++)
+    {
+        if (!fields_[n].saveOutput(argList, envMap))
+        {
+            failureCount++;
+        }
+    }
+    if (failureCount > 0)
+    {
+        emit logging(QString().sprintf("Skipping execution due to %d validation failures", failureCount));
+    }
+    else
+    {
+        qDebug().noquote() << "args" << argList << "env" << envMap;
+        argList.removeFirst();
+        if (plugin_->runScript(argList, envMap))
+        {
+            emit logging("Execution successful");
+        }
+        else
+        {
+            emit logging("Execution FAILED");
+        }
+    }
 }

@@ -26,9 +26,12 @@ public:
     bool isValid() const { return !(id_.isEmpty() || context_.isEmpty()); }
     bool isVisible() const { return true; }
     QByteArray runScript(QStringList args, bool& success);
+    bool runScript(QList<QString> const& args, QMap<QString,QString> const& env);
     QJsonObject form();
+    QString getScriptPath() const { return scriptPath_; }
 
 signals:
+    void outputLine(QString s);
 
 public slots:
 

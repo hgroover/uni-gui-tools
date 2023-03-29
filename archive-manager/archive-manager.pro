@@ -36,7 +36,8 @@ SOURCES += \
     mainwindow_extract.cpp \
     plugin.cpp \
     dlgplugins.cpp \
-    dlgpluginui.cpp
+    dlgpluginui.cpp \
+    pluginfield.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -47,7 +48,8 @@ HEADERS += \
     loglistmodel.h \
     plugin.h \
     dlgplugins.h \
-    dlgpluginui.h
+    dlgpluginui.h \
+    pluginfield.h
 
 FORMS += \
         mainwindow.ui \

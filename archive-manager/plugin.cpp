@@ -86,3 +86,39 @@ QByteArray Plugin::runScript(QStringList args, bool &success)
     success = true;
     return b;
 }
+
+bool Plugin::runScript(const QList<QString> &args, const QMap<QString, QString> &env)
+{
+    MainWindow *m = qobject_cast<MainWindow*>(parent());
+    QString cmd(m->shellCmdLine(scriptPath_, args));
+    QProcess runner(this);
+    QProcessEnvironment processEnv;
+    if (!env.isEmpty())
+    {
+        processEnv = QProcessEnvironment::systemEnvironment();
+        QMap<QString,QString>::const_iterator i;
+        for (i = env.begin(); i != env.end(); i++)
+        {
+            processEnv.insert(i.key(), i.value());
+        }
+        runner.setProcessEnvironment(processEnv);
+    }
+    runner.start(cmd);
+    if (!runner.waitForStarted(500))
+    {
+        qCritical().noquote() << "Failed to start" << cmd;
+        return false;
+    }
+    if (!runner.waitForFinished(1000))
+    {
+        qCritical().noquote() << "Failed to finish" << cmd;
+        return false;
+    }
+    QList<QByteArray> b = runner.readAll().split('\n');
+    for (int n = 0; n < b.count(); n++)
+    {
+        if (b[n].isEmpty()) continue;
+        emit outputLine(b[n]);
+    }
+    return true;
+}

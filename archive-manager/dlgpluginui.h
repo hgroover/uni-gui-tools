@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QJsonDocument>
+#include <QList>
 
 #include "mainwindow.h"
 #include "plugin.h"
@@ -34,6 +35,7 @@ private:
     MainWindow *main_;
     Plugin *plugin_;
     QJsonObject form_;
+    QList<PluginField> fields_;
 
 };
 

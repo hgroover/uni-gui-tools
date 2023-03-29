@@ -6,6 +6,7 @@
 #include <QMap>
 
 #include "plugin.h"
+#include "pluginfield.h"
 
 class MainWindow;
 
