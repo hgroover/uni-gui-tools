@@ -9,6 +9,7 @@
 #include <QMessageLogContext>
 #include <QDir>
 #include <QFile>
+#include <QDateTime>
 
 #include <iostream>
 #include <stdio.h>
@@ -36,8 +37,14 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
     case QtCriticalMsg:
         //fprintf(stderr, "Critical: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
         //break;
-        fprintf( fLog, "%s\n", localMsg.constData() );
-        fflush( fLog );
+        {
+            if (fLog != stderr)
+            {
+                fprintf( fLog, "[%s] ", QDateTime::currentDateTime().toString("yyyy-MM-dd HHmmss.zzz").toLocal8Bit().constData() );
+            }
+            fprintf( fLog, "%s\n", localMsg.constData() );
+            fflush( fLog );
+        }
         break;
     case QtFatalMsg:
         fprintf( fLog, "Fatal: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);

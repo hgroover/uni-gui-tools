@@ -24,7 +24,9 @@ public:
     const QString &id() const { return id_; }
     const QString &context() const { return context_; }
     bool isValid() const { return !(id_.isEmpty() || context_.isEmpty()); }
+    bool isVisible() const { return true; }
     QByteArray runScript(QStringList args, bool& success);
+    QJsonObject form();
 
 signals:
 

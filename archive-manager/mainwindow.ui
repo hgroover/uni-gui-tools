@@ -225,6 +225,16 @@
           </spacer>
          </item>
          <item>
+          <widget class="QPushButton" name="btnPlugins">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Plugins...</string>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QPushButton" name="btnDownload">
            <property name="enabled">
             <bool>false</bool>
@@ -284,7 +294,7 @@
      <x>0</x>
      <y>0</y>
      <width>727</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>

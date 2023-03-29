@@ -8,6 +8,7 @@
 #include "webdownload.h"
 #include "loglistmodel.h"
 #include "plugin.h"
+#include "dlgplugins.h"
 
 namespace Ui {
 class MainWindow;
@@ -37,6 +38,7 @@ signals:
     void updatedBaseUrl(QString baseUrl);
     void updatedLogFilespec(QString filespec);
     void updatedLogDir(QString logDir);
+    void pluginListReady();
 
 public slots:
     bool hasLocalCopy(QString logFile);
@@ -59,6 +61,8 @@ protected slots:
     void on_DownloadCompleted(QString filename);
     void on_AssertFirstSelection();
     void on_InitialLoad();
+    void on_PluginDialogReady();
+    int loadPlugins();
     void testAnimator();
 
     // in mainwindow_extract.cpp
@@ -97,15 +101,17 @@ private slots:
 
     void on_lstLogsModel_clicked(const QModelIndex &index);
 
+    void on_btnPlugins_clicked();
+
 protected:
     // In mainwindow_extract.cpp
     QProcess *prepareRunner();
 
-    int loadPlugins();
 
 private:
     Ui::MainWindow *ui;
     WebDownload web_;
+    DlgPlugins dlgPlugins_;
 
     // Set in config dialog
     QString logDir_;

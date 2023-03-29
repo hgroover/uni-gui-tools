@@ -47,6 +47,7 @@
         "Persist": false,
         "Required": false,
         "Default": "sunny"
+      }
     ]
   }
 }

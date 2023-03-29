@@ -58,6 +58,12 @@ void Plugin::init(QString scriptPath)
     m->addPlugin(this);
 }
 
+QJsonObject Plugin::form()
+{
+    QJsonObject j = defs_.object();
+    return j["Form"].toObject();
+}
+
 QByteArray Plugin::runScript(QStringList args, bool &success)
 {
     success = false;
