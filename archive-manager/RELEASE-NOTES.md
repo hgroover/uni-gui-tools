@@ -4,11 +4,14 @@
 
 This has UI plugins fully operational.
 
-- added: detach download and viewer dialogs
-- added: run extract script asynchronously and capture output to log
-
 
 ## Previous versions
+
+## 1.0.8 21-Mar-2023
+
+- added: detach download and viewer dialogs
+- added: plugins for download context
+- added: run extract script asynchronously and capture output to log
 
 ## 1.0.7
 

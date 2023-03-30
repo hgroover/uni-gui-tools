@@ -398,7 +398,7 @@ void MainWindow::on_txtItemDetails_anchorClicked(const QUrl &arg1)
         else
         {
             qInfo().noquote() << "Size" << fi.size() << "for" << fi.filePath() << "under limit" << viewExternalViewTrigger_;
-            BasicFileViewer *view = new BasicFileViewer(this, curLogExtractDir_, verbObject);
+            BasicFileViewer *view = new BasicFileViewer(nullptr, curLogExtractDir_, verbObject);
             view->setModal(false);
             view->showNormal();
             setFocus();
