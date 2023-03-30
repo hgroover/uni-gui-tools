@@ -3,7 +3,8 @@
 
 #define MYQSETTINGS(instanceName) QSettings instanceName("archive-manager.ini", QSettings::IniFormat)
 
-#define MY_APP_VER "1.0.9"
+// New scheme is major:1, minor:1, build:02
+#define MY_APP_VER "1.1.10"
 
 static const char *cfg_cw_geometry = "cw_geometry";
 static const char *cfg_cw_state = "cw_state";

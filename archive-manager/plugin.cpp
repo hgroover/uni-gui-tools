@@ -17,14 +17,14 @@ void Plugin::init(QString scriptPath)
     QString cmd(m->shellCmdLine(scriptPath, args));
     QProcess defRunner(this);
     defRunner.start(cmd);
-    if (!defRunner.waitForStarted(500))
+    if (!defRunner.waitForStarted(1000))
     {
         curState_ = DS_BADDEFS;
         qCritical().noquote() << "Failed to start" << scriptPath;
         deleteLater();
         return;
     }
-    if (!defRunner.waitForFinished(1000))
+    if (!defRunner.waitForFinished(2500))
     {
         curState_ = DS_BADDEFS;
         qCritical().noquote() << "Failed to get defs" << scriptPath;

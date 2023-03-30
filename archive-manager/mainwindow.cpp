@@ -13,7 +13,7 @@
 #include <QStringList>
 #include <QFileInfo>
 
-int MainWindow::g_verbose = 1;
+int MainWindow::g_verbose = 0;
 const QList<QList<QString>> MainWindow::a_sortLinks = {
     {"dateDescending", "date▼", "Show logs sorted by download date starting from most recent"},
     {"dateAscending", "date▲", "Show logs sorted by download date from oldest to newest"},
@@ -324,7 +324,7 @@ QString MainWindow::bashify(QString windowsPath)
     QString driveLetter = windowsPath.left(2);
     if (driveLetter.length() < 2 || driveLetter[1] != ':')
     {
-        qWarning().noquote() << "Not an absolute windows path:" << windowsPath;
+        qDebug().noquote() << "Not an absolute windows path:" << windowsPath;
         return windowsPath;
     }
     return driveLetter.left(1).toLower().prepend('/') + windowsPath.mid(2);
