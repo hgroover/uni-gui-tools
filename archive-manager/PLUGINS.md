@@ -56,12 +56,12 @@ Here's a simple example plugin which might be saved as ~/plugins/hello.am-plugin
         "Required": true,
         "Elements": [
           { "Label": "Sunday", "Value": "Sun" },
-          { "Label": "Mon" },
-          { "Label": "Tue" },
-          { "Label": "Wed" },
-          { "Label": "Thu" },
-          { "Label": "Fri" },
-          { "Label": "Sat" }
+          { "Value": "Mon" },
+          { "Value": "Tue" },
+          { "Value": "Wed" },
+          { "Value": "Thu" },
+          { "Value": "Fri" },
+          { "Value": "Sat" }
         ]
       },
       {
@@ -73,6 +73,7 @@ Here's a simple example plugin which might be saved as ~/plugins/hello.am-plugin
         "Persist": false,
         "Required": false,
         "Default": "sunny"
+      }
     ]
   }
 }

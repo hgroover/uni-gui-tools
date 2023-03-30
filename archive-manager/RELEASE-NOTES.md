@@ -1,13 +1,17 @@
 # Release notes and change log
 
+## 1.0.9 29-Mar-2023
+
+This has UI plugins fully operational.
+
+
+## Previous versions
+
 ## 1.0.8 21-Mar-2023
 
 - added: detach download and viewer dialogs
 - added: plugins for download context
 - added: run extract script asynchronously and capture output to log
-
-
-## Previous versions
 
 ## 1.0.7
 

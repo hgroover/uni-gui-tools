@@ -29,13 +29,13 @@
         "Persist": false,
         "Required": true,
         "Elements": [
-          { "Label": "Sunday", "Value": "Sun" },
-          { "Label": "Mon" },
-          { "Label": "Tue" },
-          { "Label": "Wed" },
-          { "Label": "Thu" },
-          { "Label": "Fri" },
-          { "Label": "Sat" }
+          { "Label": "Sun", "Value": "Sunday" },
+          { "Value": "Mon" },
+          { "Value": "Tue" },
+          { "Value": "Wed" },
+          { "Value": "Thu" },
+          { "Value": "Fri" },
+          { "Value": "Sat" }
         ]
       },
       {
@@ -46,7 +46,8 @@
         "Type": "text",
         "Persist": false,
         "Required": false,
-        "Default": "sunny"
+        "Default": "sunny",
+        "ToolTip": "Describe current weather conditions, whether hot or cold or rainy"
       }
     ]
   }

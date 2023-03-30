@@ -34,7 +34,10 @@ SOURCES += \
     mainwindow_viewbrowser.cpp \
     loglistmodel.cpp \
     mainwindow_extract.cpp \
-    plugin.cpp
+    plugin.cpp \
+    dlgplugins.cpp \
+    dlgpluginui.cpp \
+    pluginfield.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -43,13 +46,18 @@ HEADERS += \
     webdownload.h \
     basicfileviewer.h \
     loglistmodel.h \
-    plugin.h
+    plugin.h \
+    dlgplugins.h \
+    dlgpluginui.h \
+    pluginfield.h
 
 FORMS += \
         mainwindow.ui \
     dlgconfig.ui \
     webdownload.ui \
-    basicfileviewer.ui
+    basicfileviewer.ui \
+    dlgplugins.ui \
+    dlgpluginui.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

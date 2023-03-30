@@ -13,7 +13,7 @@
 #include <QStringList>
 #include <QFileInfo>
 
-int MainWindow::g_verbose = 0;
+int MainWindow::g_verbose = 1;
 const QList<QList<QString>> MainWindow::a_sortLinks = {
     {"dateDescending", "date▼", "Show logs sorted by download date starting from most recent"},
     {"dateAscending", "date▲", "Show logs sorted by download date from oldest to newest"},
@@ -25,6 +25,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     web_(this),
+    dlgPlugins_(this),
     extractionValid_(false),
     bashValid_(false),
     extractScriptValid_(false),
@@ -35,18 +36,20 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->lstLogsModel->setModel(logList_);
     on_InitialLoad();
     MYQSETTINGS(settings);
-    setWindowTitle(windowTitle() + " v" MY_APP_VER);
+    setWindowTitle(QApplication::applicationDisplayName() + " v" MY_APP_VER);
     restoreGeometry(settings.value(cfg_mw_geometry).toByteArray());
     restoreState(settings.value(cfg_mw_state).toByteArray());
     connect(this, SIGNAL(updatedBaseUrl(QString)), &web_, SLOT(on_UpdatedBaseUrl(QString)));
     connect(this, SIGNAL(updatedLogFilespec(QString)), &web_, SLOT(on_UpdatedFilespec(QString)));
     connect(this, SIGNAL(updatedLogDir(QString)), &web_, SLOT(on_UpdatedLogDir(QString)));
     connect(&web_, SIGNAL(downloadCompleted(QString)), this, SLOT(on_DownloadCompleted(QString)));
+    connect(this, SIGNAL(pluginListReady()), &dlgPlugins_, SLOT(on_pluginListReady()));
+    connect(&dlgPlugins_, SIGNAL(pluginDialogReady()), this, SLOT(on_PluginDialogReady()));
     selectLogSort("dateDescending");
     emit updatedLogDir(logDir_);
     QTimer::singleShot(500, this, SLOT(on_Refresh()));
     //QTimer::singleShot(2000, this, SLOT(testAnimator()));
-    loadPlugins();
+    QTimer::singleShot(0, this, SLOT(loadPlugins()));
 }
 
 MainWindow::~MainWindow()
@@ -634,6 +637,7 @@ int MainWindow::loadPlugins()
         }
     }
     qInfo() << totalAdded << "plugins added";
+    emit pluginListReady();
     return totalAdded;
 }
 
@@ -649,4 +653,21 @@ QList<Plugin*> MainWindow::getPluginsForContext(QString context)
         }
     }
     return r;
+}
+
+void MainWindow::on_btnPlugins_clicked()
+{
+    if (!dlgPlugins_.isVisible())
+    {
+        dlgPlugins_.setVisible(true);
+    }
+    qInfo().noquote() << "Showing plugins window";
+    dlgPlugins_.show();
+    //emit ???
+    dlgPlugins_.setFocus();
+}
+
+void MainWindow::on_PluginDialogReady()
+{
+    ui->btnPlugins->setEnabled(true);
 }
