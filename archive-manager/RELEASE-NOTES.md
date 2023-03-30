@@ -1,5 +1,15 @@
 # Release notes and change log
 
+## 1.0.9 29-Mar-2023
+
+This has UI plugins fully operational.
+
+- added: detach download and viewer dialogs
+- added: run extract script asynchronously and capture output to log
+
+
+## Previous versions
+
 ## 1.0.7
 
 This uses the view model list which provide flexible sort options.
@@ -7,9 +17,6 @@ This uses the view model list which provide flexible sort options.
 - added: sort links for log list, default to date
 - fixed: problem with two links on one line. This was actually wrapped items in the list widget
 - added: global options to toggle debug verbosity
-
-
-## Previous versions
 
 ## 1.0.6 13-Mar-2023
 
