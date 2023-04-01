@@ -8,3 +8,5 @@ As items get completed they move from here to RELEASE-NOTES.md
 - BUG: clear does not refresh view
 - BUG: refresh log list may change selection but not refresh contents
 - BUG: first plugin is sometimes completing slowly on windows for __getdefs
+- FEATURE: bring underlying windows up (e.g. plugin UI and plugin output window)
+- FEATURE: show sizes and timestamps in downloads
