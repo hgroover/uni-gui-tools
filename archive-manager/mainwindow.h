@@ -69,6 +69,9 @@ protected slots:
     void on_ExtractionFinished(int exitCode, QProcess::ExitStatus exitStatus);
     void on_ExtractionReadyRead();
     void on_ExtractionError(QProcess::ProcessError error);
+    void on_PostFinished(int exitCode, QProcess::ExitStatus exitStatus);
+    void on_PostError(QProcess::ProcessError error);
+    void refreshCurrent();
 
 private slots:
     // Where we save state/position. Ideally use installEventFilter() and get resize and change state events
@@ -105,7 +108,7 @@ private slots:
 
 protected:
     // In mainwindow_extract.cpp
-    QProcess *prepareRunner();
+    QProcess *prepareRunner(bool post);
 
 
 private:

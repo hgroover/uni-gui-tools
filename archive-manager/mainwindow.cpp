@@ -263,7 +263,7 @@ void MainWindow::on_btnLogExtract_clicked()
         QApplication::processEvents();
         QApplication::processEvents();
         qInfo().noquote() << "Extracting" << curLogFilename_ << "to" << curLogExtractDir_;
-        QProcess * pExtract = prepareRunner();
+        QProcess * pExtract = prepareRunner(false);
         // You would think this would work, but the script will still run in the app dir unless we explicitly change
         // the app's working directory.
         pExtract->setWorkingDirectory(curLogExtractDir_);
