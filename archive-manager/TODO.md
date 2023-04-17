@@ -10,3 +10,5 @@ As items get completed they move from here to RELEASE-NOTES.md
 - BUG: first plugin is sometimes completing slowly on windows for __getdefs
 - FEATURE: bring underlying windows up (e.g. plugin UI and plugin output window)
 - FEATURE: show sizes and timestamps in downloads
+- BUG: download window refresh does not rebuild plugin-supplied links
+- FEATURE: show size and timestamp for archive in preview window
