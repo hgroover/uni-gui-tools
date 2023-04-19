@@ -55,7 +55,12 @@ void MainWindow::on_ExtractionFinished(int exitCode, QProcess::ExitStatus exitSt
     }
     if (postCount > 0)
     {
+        ui->statusBar->showMessage(QString().sprintf("Started %d post-processing plugins", postCount), 10000);
         QDir::setCurrent(appCurrentDir);
+    }
+    else
+    {
+        ui->statusBar->showMessage("Extraction complete, no post-processing plugins", 10000);
     }
     // Refresh regardless of exit code
     refreshCurrent();
@@ -66,6 +71,7 @@ void MainWindow::refreshCurrent()
     if (curLogFilename_.isEmpty()) return;
     QModelIndex i = logList_->findByFile(curLogFilename_);
     qInfo().noquote() << "index" << i << "for" << curLogFilename_;
+    ui->lstLogsModel->scrollTo(i, QAbstractItemView::EnsureVisible);
     on_lstLogsModel_clicked(i);
 }
 
@@ -100,6 +106,7 @@ void MainWindow::on_PostFinished(int exitCode, QProcess::ExitStatus exitStatus)
     {
         qWarning() << "Failed to get sender";
     }
+    ui->statusBar->showMessage(QString().sprintf("Completed post-processing with exit code %d", exitCode), 10000);
     // Refresh regardless of exit code
     refreshCurrent();
 }
@@ -107,4 +114,5 @@ void MainWindow::on_PostFinished(int exitCode, QProcess::ExitStatus exitStatus)
 void MainWindow::on_PostError(QProcess::ProcessError error)
 {
     qWarning() << "Failed post-processing action:" << error;
+    ui->statusBar->showMessage("Post-processing failed", 10000);
 }

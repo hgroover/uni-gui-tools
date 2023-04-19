@@ -29,7 +29,18 @@ void MainWindow::populateViewBrowser(bool extracted)
     }
     else
     {
-        html = "<h4>No contents</h4><p><a href=\"extract:" + curLogFilename_ + "\">click here</a> or extract button</p>";
+        html = "<h4>Contents not yet extracted</h4><p><a href=\"extract:" + curLogFilename_ + "\">click here</a> or extract button</p>";
+        QFileInfo fi(curLogTarballPath_);
+        if (fi.exists())
+        {
+            html += QString().sprintf("<p>Archive size: %s<br/>Last modified: ", qPrintable(humanFriendlyFileSize(fi.size())));
+            html += fi.lastModified().toString();
+            html += "</p>";
+        }
+        else
+        {
+            html += ("<p>Failed to get information on " + curLogTarballPath_ + "</p>");
+        }
     }
     ui->txtItemDetails->setText(html);
 }

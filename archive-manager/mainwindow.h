@@ -24,6 +24,7 @@ public:
 
     static QString tarballBasename(QString tarballFilename);
     static QString bashify(QString windowsPath);
+    static QString humanFriendlyFileSize(qint64 sizeInBytes);
     void setLogVerboseLevel(int level) { g_verbose = level; }
 
     // Provide a variant shell command line that will work on Windows+gitbash or Linux or OSX
@@ -107,6 +108,8 @@ private slots:
     void on_btnPlugins_clicked();
 
 protected:
+    bool canShell() const;
+
     // In mainwindow_extract.cpp
     QProcess *prepareRunner(bool post);
 
