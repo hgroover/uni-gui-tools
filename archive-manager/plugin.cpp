@@ -17,17 +17,22 @@ void Plugin::init(QString scriptPath)
     QString cmd(m->shellCmdLine(scriptPath, args));
     QProcess defRunner(this);
     defRunner.start(cmd);
-    if (!defRunner.waitForStarted(500))
+    // Calling processEvents() here is a hack.
+    // Ideally we restructure init to set up a list of expected returns, then when we either get all
+    // or a timeout occurs, perform the final summary on initPlugins()
+    QCoreApplication::processEvents();
+    if (!defRunner.waitForStarted(5000))
     {
         curState_ = DS_BADDEFS;
         qCritical().noquote() << "Failed to start" << scriptPath;
         deleteLater();
         return;
     }
-    if (!defRunner.waitForFinished(1000))
+    QCoreApplication::processEvents();
+    if (!defRunner.waitForFinished(10000))
     {
         curState_ = DS_BADDEFS;
-        qCritical().noquote() << "Failed to get defs" << scriptPath;
+        qCritical().noquote() << "Failed to get defs" << scriptPath << "state" << defRunner.state();
         deleteLater();
         return;
     }

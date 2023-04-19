@@ -13,7 +13,7 @@
 #include <QStringList>
 #include <QFileInfo>
 
-int MainWindow::g_verbose = 1;
+int MainWindow::g_verbose = 0;
 const QList<QList<QString>> MainWindow::a_sortLinks = {
     {"dateDescending", "date▼", "Show logs sorted by download date starting from most recent"},
     {"dateAscending", "date▲", "Show logs sorted by download date from oldest to newest"},
@@ -225,6 +225,15 @@ void MainWindow::on_Refresh()
     emit updatedLogFilespec(logFilespec_);
 }
 
+bool MainWindow::canShell() const
+{
+#if defined(Q_OS_WIN)
+    return bashValid_;
+#else
+    return true;
+#endif
+}
+
 QString MainWindow::shellCmdLine(QString shellPath, QStringList shellArgs)
 {
     QString cmdLine;
@@ -259,11 +268,12 @@ void MainWindow::on_btnLogExtract_clicked()
     {
         ui->btnLogExtract->setEnabled(false);
         ui->txtItemDetails->setText("<html><p>Please wait... extraction in progress<p></html>");
+        ui->statusBar->showMessage("Extracting " + curLogFilename_, 10000);
         QApplication::processEvents();
         QApplication::processEvents();
         QApplication::processEvents();
         qInfo().noquote() << "Extracting" << curLogFilename_ << "to" << curLogExtractDir_;
-        QProcess * pExtract = prepareRunner();
+        QProcess * pExtract = prepareRunner(false);
         // You would think this would work, but the script will still run in the app dir unless we explicitly change
         // the app's working directory.
         pExtract->setWorkingDirectory(curLogExtractDir_);
@@ -324,7 +334,7 @@ QString MainWindow::bashify(QString windowsPath)
     QString driveLetter = windowsPath.left(2);
     if (driveLetter.length() < 2 || driveLetter[1] != ':')
     {
-        qWarning().noquote() << "Not an absolute windows path:" << windowsPath;
+        qDebug().noquote() << "Not an absolute windows path:" << windowsPath;
         return windowsPath;
     }
     return driveLetter.left(1).toLower().prepend('/') + windowsPath.mid(2);
@@ -355,11 +365,14 @@ void MainWindow::on_btnClear_clicked()
         {
             qInfo().noquote() << "Success";
             //FIXME on_lstLogs_currentRowChanged(ui->lstLogs->currentRow());
+            ui->statusBar->showMessage("Cleared directory successfully", 10000);
         }
         else
         {
             qWarning().noquote() << "Failed to remove recursively";
+            ui->statusBar->showMessage("Failed to clear directory", 10000);
         }
+        refreshCurrent();
     }
     else
     {
@@ -573,16 +586,17 @@ void MainWindow::on_lstLogsModel_clicked(const QModelIndex &index)
     else
     {
         curLogFilename_ = logList_->fileFromIndex(index);
-        qDebug().noquote() << "New log model selection" << curLogFilename_;
+        qInfo().noquote() << "New log model selection" << curLogFilename_ << "ev" << extractionValid_ << "bv" << canShell() << "esv" << extractScriptValid_;
+        ui->statusBar->showMessage("Selected " + curLogFilename_, 10000);
         //QFileInfo fi(curLogFilename_);
         QString baseName(tarballBasename(curLogFilename_));
         QDir emptyDir(extractDir_ + '/' + baseName);
         curLogTarballPath_ = logDir_ + '/' + curLogFilename_;
         curLogExtractDir_ = emptyDir.path();
-        ui->btnLogExtract->setEnabled(extractionValid_ && bashValid_ && extractScriptValid_ && !emptyDir.exists());
+        ui->btnLogExtract->setEnabled(extractionValid_ && canShell() && extractScriptValid_ && !emptyDir.exists());
         ui->btnClear->setEnabled(emptyDir.exists());
         ui->btnView->setEnabled(emptyDir.exists());
-        qInfo().noquote() << "Updating view browser";
+        qInfo().noquote() << "Updating view browser, dir exists:" << emptyDir.exists();
         populateViewBrowser(emptyDir.exists());
     }
 }
@@ -670,4 +684,13 @@ void MainWindow::on_btnPlugins_clicked()
 void MainWindow::on_PluginDialogReady()
 {
     ui->btnPlugins->setEnabled(true);
+}
+
+QString MainWindow::humanFriendlyFileSize(qint64 sizeInBytes)
+{
+    if (sizeInBytes >= 1024 * 1024)
+        return QString().sprintf("%.1fmb", sizeInBytes / (1024.0 * 1024));
+    if (sizeInBytes >= 16 * 1024)
+        return QString().sprintf("%lldkb", sizeInBytes / 1024);
+    return QString().sprintf("%lld", sizeInBytes);
 }

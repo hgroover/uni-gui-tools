@@ -24,6 +24,7 @@ public:
 
     static QString tarballBasename(QString tarballFilename);
     static QString bashify(QString windowsPath);
+    static QString humanFriendlyFileSize(qint64 sizeInBytes);
     void setLogVerboseLevel(int level) { g_verbose = level; }
 
     // Provide a variant shell command line that will work on Windows+gitbash or Linux or OSX
@@ -69,6 +70,9 @@ protected slots:
     void on_ExtractionFinished(int exitCode, QProcess::ExitStatus exitStatus);
     void on_ExtractionReadyRead();
     void on_ExtractionError(QProcess::ProcessError error);
+    void on_PostFinished(int exitCode, QProcess::ExitStatus exitStatus);
+    void on_PostError(QProcess::ProcessError error);
+    void refreshCurrent();
 
 private slots:
     // Where we save state/position. Ideally use installEventFilter() and get resize and change state events
@@ -104,8 +108,10 @@ private slots:
     void on_btnPlugins_clicked();
 
 protected:
+    bool canShell() const;
+
     // In mainwindow_extract.cpp
-    QProcess *prepareRunner();
+    QProcess *prepareRunner(bool post);
 
 
 private:

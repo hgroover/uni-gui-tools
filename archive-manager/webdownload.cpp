@@ -46,7 +46,13 @@ void WebDownload::on_btnDone_clicked()
     for (int n = 0; n < selected.count(); n++)
     {
         qInfo().noquote() << '[' << n << ']' << selected[n]->text();
-        beginDownload(selected[n]->text().mid(prefixLen_));
+        // Remove optional [date] size
+        QString sFile(selected[n]->text().mid(prefixLen_));
+        if (sFile.contains(" ["))
+        {
+            sFile = sFile.left(sFile.indexOf(" ["));
+        }
+        beginDownload(sFile);
     }
     MYQSETTINGS(settings);
     settings.setValue(cfg_dw_geometry, saveGeometry());
@@ -130,10 +136,26 @@ void WebDownload::on_ReplyFinished(QNetworkReply *reply)
         qDebug().noquote() << "Raw data -" << rawData.length() << "byte," << a.size() << "lines:";
         qDebug().noquote() << rawData;
         qDebug().noquote() << "-----------------";
+        // Typical Apache, with whitespace line breaks added:
+        // <tr>
+        //     <td valign="top"><img src="/icons/tar.gif" alt="[   ]"></td>
+        //     <td><a href="foo.tar">foo.tar</a></td>
+        //     <td align="right">2023-04-18 09:17  </td>
+        //     <td align="right">3.1M</td>
+        //     <td>&nbsp;</td>
+        // </tr>
+        // Artifactory, whitespace converted to indented line breaks
+        // <a href="logs_UNICORNDB_48A2E6B396BF_uncrn_48A2E6B396BF_1.727.2_PersonDetectAnimationStaysOn_0418_02_04_EDT.tar">logs_UNICORNDB_48A2E6B396BF_uncrn_48A2E6B396BF_1.727.2_PersonDetectAnimationStaysOn_0418_02_04_EDT.tar</a>
+        //      18-Apr-2023 13:58
+        //      340.00 KB
+
     }
     // Extract filenames from href="" tags
     QStringList aFiles;
     QRegExp reHref("href=\"([^\"]*)\"");
+    // Get table columns 3-5
+    QRegExp reTblColumns("<td[^>]*>([^<]*)\\s*</td>[^<]*<td[^>]*>(.*)\\s*</td>[^<]*<td[^>]*>([^<]*)\\s*</td>");
+    QRegExp reArtifactory("<a[^>]*>[^<]*</a>\\s+(\\S+\\s+\\S+)\\s+(\\S+\\s*\\S*)");
     ui->lstFiles->clear();
     int rejectCount = 0;
     for (int n = 0; n < a.size(); n++)
@@ -167,16 +189,56 @@ void WebDownload::on_ReplyFinished(QNetworkReply *reply)
                         qDebug().noquote() << "Non-local" << fnCandidate << "a[n]" << a[n];
                     }
                     QString s(prefix + fnCandidate);
+                    // Try to get date (column 1) and size (column 2)
+                    if (reTblColumns.indexIn(a[n]) != -1)
+                    {
+                        if (reTblColumns.captureCount() >= 2)
+                        {
+                            s += ' ';
+                            s += '[';
+                            s += reTblColumns.cap(1).trimmed();
+                            s += ']';
+                            s += ' ';
+                            s += reTblColumns.cap(2).trimmed();
+                        }
+                        else
+                        {
+                            qDebug().noquote() << "capcount" << reTblColumns.captureCount() << reTblColumns.cap(0);
+                        }
+                    }
+                    else if (reArtifactory.indexIn(a[n]) != -1)
+                    {
+                        if (reArtifactory.captureCount() >= 2)
+                        {
+                            s += ' ';
+                            s += '[';
+                            s += reArtifactory.cap(1).trimmed();
+                            s += ']';
+                            s += ' ';
+                            s += reArtifactory.cap(2).trimmed();
+                        }
+                        else
+                        {
+                            qDebug().noquote() << "capcount" << reArtifactory.captureCount() << reArtifactory.cap(0);
+                        }
+                    }
+                    else
+                    {
+                        qDebug().noquote() << "no Apache or Artifactory match:" << a[n];
+                    }
                     if (MainWindow::g_verbose > 0)
                     {
                         qDebug().noquote() << "Adding to list:" << s;
                     }
-                    // Turned of isWrapping which caused the second column
+                    // Turned off isWrapping which caused the second column
                     ui->lstFiles->addItem(s);
                 }
                 else
                 {
-                    qInfo().noquote() << "Does not match:" << fnCandidate;
+                    if (MainWindow::g_verbose > 1)
+                    {
+                        qInfo().noquote() << "Does not match:" << fnCandidate;
+                    }
                     rejectCount++;
                 }
             }

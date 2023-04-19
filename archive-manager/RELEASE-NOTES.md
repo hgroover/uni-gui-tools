@@ -1,17 +1,31 @@
 # Release notes and change log
 
-## 1.0.9 29-Mar-2023
+## 1.1.10 19-Apr-2023
 
-This has UI plugins fully operational.
+Switched to sortable release version numbering
+(build number will be left-padded and rollover at 99 with new minor)
+
+- fixed: first plugin is sometimes completing slowly on windows for __getdefs
+- added: support for post-extraction plugins
+- added: show sizes and timestamps in downloads
+- fixed: clear does not refresh view
+- fixed: Linux ui extract button not enabled
+- added: show size and timestamp for archive in preview window
+- rejected: download window refresh does not rebuild plugin-supplied links (not reproducible)
 
 
 ## Previous versions
+
+## 1.0.9 29-Mar-2023
+
+This has UI plugins fully operational.
 
 ## 1.0.8 21-Mar-2023
 
 - added: detach download and viewer dialogs
 - added: plugins for download context
 - added: run extract script asynchronously and capture output to log
+- fixed: refresh on download dialog does not work
 
 ## 1.0.7
 
