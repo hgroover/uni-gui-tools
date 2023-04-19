@@ -1,8 +1,12 @@
 # Release notes and change log
 
-## 1.1.10
+## 1.1.10 19-Apr-2023
 
 Switched to sortable numbering (build number will be left-padded and rollover at 99 with new minor)
+
+- fixed: first plugin is sometimes completing slowly on windows for __getdefs
+- added: support for post-extraction plugins
+- added: show sizes and timestamps in downloads
 
 
 ## Previous versions
